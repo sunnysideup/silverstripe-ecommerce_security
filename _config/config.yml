@@ -3,6 +3,15 @@ Name: ecommerce_security
 Before: 'mysite/*'
 After: 'framework/*','cms/*','ecommerce/*'
 ---
-SalesAdminExtras:
+SecurityCheck_ModelAdmin:
   managed_models:
     - EcommerceSecurityBaseClass
+
+---
+Only:
+  moduleexists: 'grouped-cms-menu'
+---
+LeftAndMain:
+  menu_groups:
+    Shop:
+      - SecurityCheck_ModelAdmin
