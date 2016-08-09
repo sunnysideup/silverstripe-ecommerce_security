@@ -24,7 +24,10 @@ class EcommerceSecurityBaseClass extends DataObject
     );
 
     private static $indexes = array(
-        'Title' => true
+        'MyUniqueIndex' => array(
+            'type' => 'unique',
+            'value' => '"ClassName","Title"'
+        )
     );
     private static $casting = array(
         'Type' => 'Varchar'
