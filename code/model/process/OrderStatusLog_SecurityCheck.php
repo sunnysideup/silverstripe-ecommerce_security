@@ -89,8 +89,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             'Note'
         );
         $fields->addFieldToTab(
-            "Root.Unrequired",
-            HeaderField::create('UnrequiredChecksHeader','Unrequired Checks'),
+            "Root.NotRequired",
+            HeaderField::create('UnrequiredChecksHeader','Checks that are not required for this order'),
             'Note'
         );
         $hasRequiredChecks = false;
@@ -104,13 +104,11 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     $fields->dataFieldByName($fieldName)->setTitle($details['Title'])
                 );
             } else {
-                foreach($fieldNames as $fieldName) {
-                    $hasUnrequiredChecks = true;
-                    $fields->addFieldToTab(
-                        'Root.Unrequired',
-                        $fields->dataFieldByName($fieldName)->setTitle($details['Title'])
-                    );
-                }
+                $hasUnrequiredChecks = true;
+                $fields->addFieldToTab(
+                    'Root.NotRequired',
+                    $fields->dataFieldByName($fieldName)->setTitle($details['Title'])
+                );
             }
         }
         foreach($allFields as $fieldToRemove) {
