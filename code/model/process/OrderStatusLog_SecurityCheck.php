@@ -283,7 +283,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 foreach($fields as $tempOrder) {
                     break;
                 }
-                $html .= '<li><a href="'.$tempOrder->CMSEditLink().'">'.$tempOrder->getTitle().'</a>: '.implode(', ', array_keys($fields)).'</li>';
+                $html .= '<li><a href="'.$tempOrder->CMSEditLink().'">'.$tempOrder->getTitle().'</a>: with same '.implode(', and with same ', array_keys($fields)).'</li>';
             }
             $html .= '</ul>';
         } else {
@@ -308,20 +308,18 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         }
         $checks = $this->Config()->get('checks_required');
         $fieldsAvailable = $this->stat('db');
-        $pass = true;
         foreach($checks as $fieldName => $fieldDetails) {
-            $pass = false;
             if(floatval($this->SubTotal) > floatval($fieldDetails['SubTotalMin'])) {
                 if(! isset($fieldsAvailable[$fieldName])) {
                     user_error('bad field  ....');
                 }
-                if($this->$fieldName) {
-                    $pass = true;
+                // there is a check that needs to be TRUE, but is not ...
+                if( ! $this->$fieldName) {
+                    return false;
                 }
             }
-
         }
-        return $pass;
+        return true;
     }
 
 
