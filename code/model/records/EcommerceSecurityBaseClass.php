@@ -24,12 +24,14 @@ class EcommerceSecurityBaseClass extends DataObject
     );
 
     private static $indexes = array(
+        //see requireDefaultRecords ...
+        /*
         'MyUniqueIndex' => array(
             'type' => 'unique',
             'value' => 'ClassName,Title'
-        )
+        )*/
     );
-    
+
     private static $casting = array(
         'Type' => 'Varchar'
     );
@@ -133,6 +135,24 @@ class EcommerceSecurityBaseClass extends DataObject
     public function hasOpinion()
     {
         return $this->Status !== 'Unknown' ? true : false;
+    }
+
+    function requireDefaultRecords()
+    {
+        parent::requireDefaultRecords();
+        $rows = DB::query('SHOW INDEX FROM EcommerceSecurityBaseClass WHERE Key_name = \'MyUniqueIndex\';');
+        $count = 0;
+        foreach($rows as $row) {
+            $count++;
+        }
+        if( ! $count) {
+            DB::query('
+                ALTER TABLE "EcommerceSecurityBaseClass" ADD unique "MyUniqueIndex" ("ClassName","Title")
+            ');
+        }
+        else if($count !== 2) {
+            user_error('EcommerceSecurityBaseClass.MyUniqueIndex not set correctly.');
+        }
     }
 
 }
