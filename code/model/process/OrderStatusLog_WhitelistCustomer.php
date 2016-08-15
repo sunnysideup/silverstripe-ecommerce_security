@@ -98,6 +98,19 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                             $this->BasedOnID = $previousOne->ID;
 
                         } else {
+                            $previousOrders = Order::get()
+                                ->filter(
+                                    array(
+                                        'MemberID' => $member->ID,
+                                        'Created:LessThan' => date('Y-m-d', strtotime('-'.$daysAgo.' days')).' 00:00:00'
+                                    )
+                                )
+                                ->exclude(
+                                    array(
+                                        'OrderID' => $order->ID,
+                                        'CancelledByID:greaterThan' => 0
+                                    )
+                                )->count();
                             $this->Whitelist = false;
                         }
                     }

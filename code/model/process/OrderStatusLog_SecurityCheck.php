@@ -308,6 +308,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $html .= $warningMessage;
             }
             $html .= '</ul>';
+        } else {
+            $html .= '<h2>No Blacklisted Data Present</h2>';
         }
         if(count($similarArray)) {
             $days = $this->Config()->get('days_ago_to_check');
@@ -322,6 +324,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             $html .= '</ul>';
         } else {
             $html = '<p class="message good">There were no similar orders in the last '.$days.' days</p>';
+        }
+        $member = $order->Member();
+        if($member && $member->exists()) {
+            
         }
 
         return $html;
