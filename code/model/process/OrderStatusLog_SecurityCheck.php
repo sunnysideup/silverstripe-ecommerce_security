@@ -152,14 +152,12 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         //are there any orders with the same email in the last seven days...
         $otherOrders = Order::get()->filter(
             array('MemberID' => $member->ID) + $timeFilter
-        );
+        )->exclude(array('ID' => $order->ID));
         foreach($otherOrders as $otherOrder) {
-            if($otherOrder && $otherOrder->ID != $order->ID) {
-                if(!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
+            if(!isset($similarArray[$otherOrder->ID])) {
+                $similarArray[$otherOrder->ID] = array();
             }
+            $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
         }
         //check emails from billing address
         $emailArray = array();
@@ -176,18 +174,16 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 }
             }
         }
-        //are there any orders with the same email in the last seven days...
+        //are there any orders with the same email in the xxx seven days...
         $otherBillingAddresses = BillingAddress::get()->filter(
             array('Email' => $emailArray) + $timeFilter
-        );
+        )->exclude(array('OrderID' => $order->ID));
         foreach($otherBillingAddresses as $address) {
             $otherOrder = $address->Order();
-            if($otherOrder && $otherOrder->ID != $order->ID) {
-                if(!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
+            if(!isset($similarArray[$otherOrder->ID])) {
+                $similarArray[$otherOrder->ID] = array();
             }
+            $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
         }
 
         //phones
@@ -202,10 +198,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $phoneArray[] = $shippingAddress->ShippingPhone;
             }
         }
-        //are there any orders with the same phone in the last seven days...
+        //are there any orders with the same phone in the last xxx days...
         $otherBillingAddresses = BillingAddress::get()->filter(
             array('Phone' => $phoneArray) + $timeFilter
-        );
+        )->exclude(array('OrderID' => $order->ID));
         foreach($otherBillingAddresses as $address) {
             $otherOrder = $address->Order();
             if($otherOrder && $otherOrder->ID != $order->ID) {
@@ -217,7 +213,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         }
         $otherShippingAddresses = ShippingAddress::get()->filter(
             array('ShippingPhone' => $phoneArray) + $timeFilter
-        );
+        )->exclude(array('OrderID' => $order->ID));
         foreach($otherShippingAddresses as $address) {
             $otherOrder = $address->Order();
             if($otherOrder && $otherOrder->ID != $order->ID) {
@@ -225,6 +221,46 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     $similarArray[$otherOrder->ID] = array();
                 }
                 $similarArray[$otherOrder->ID]["Phone"] = $otherOrder;
+            }
+        }
+
+        //addresses
+        $addressArray = array();
+        if($billingAddress) {
+            if($billingAddress->Address) {
+                $addressArray[] = $billingAddress->Address;
+            }
+        }
+        if($shippingAddress) {
+            if($shippingAddress->ShippingAddress) {
+                $addressArray[] = $shippingAddress->ShippingAddress;
+            }
+        }
+        //are there any orders with the same address in the last xxx days...
+        $otherBillingAddresses = BillingAddress::get()->filter(
+            array('Address' => $addressArray) + $timeFilter
+        )->exclude(array('OrderID' => $order->ID));
+        foreach($otherBillingAddresses as $address) {
+            $otherOrder = $address->Order();
+            if($otherOrder && $otherOrder->ID != $order->ID) {
+                if(!isset($similarArray[$otherOrder->ID])) {
+                    $similarArray[$otherOrder->ID] = array();
+                }
+                $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
+            }
+        }
+        $otherShippingAddresses = ShippingAddress::get()
+            ->filter(
+                array('ShippingAddress' => $addressArray) + $timeFilter
+            )
+            ->exclude(array('OrderID' => $order->ID));
+        foreach($otherShippingAddresses as $address) {
+            $otherOrder = $address->Order();
+            if($otherOrder && $otherOrder->ID != $order->ID) {
+                if(!isset($similarArray[$otherOrder->ID])) {
+                    $similarArray[$otherOrder->ID] = array();
+                }
+                $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
             }
         }
 
@@ -238,10 +274,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $ipProxyArray[] = $payment->ProxyIP;
             }
         }
-        //are there any orders with the same phone in the last seven days...
-        $otherPayments = EcommercePayment::get()->filter(
-            array('IP' => $ipArray) + $timeFilter
-        );
+        //are there any orders with the same IP in the xxx seven days...
         foreach($ipArray as $ip) {
             if($ip) {
                 $obj = EcommerceSecurityIP::find_or_create(array("Title" => $ip));
@@ -258,14 +291,15 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 }
             }
         }
+        $otherPayments = EcommercePayment::get()->filter(
+            array('IP' => $ipArray) + $timeFilter
+        )->exclude(array('OrderID' => $order->ID));
         foreach($otherPayments as $payment) {
             $otherOrder = $payment->Order();
-            if($otherOrder && $otherOrder->ID != $order->ID) {
-                if(!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["IP"] = $otherOrder;
+            if(!isset($similarArray[$otherOrder->ID])) {
+                $similarArray[$otherOrder->ID] = array();
             }
+            $similarArray[$otherOrder->ID]["IP"] = $otherOrder;
         }
         $html = '';
         if(count($warningMessages)) {

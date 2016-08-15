@@ -33,13 +33,14 @@ class EcommerceSecurityBaseClass extends DataObject
     );
 
     private static $casting = array(
-        'Type' => 'Varchar'
+        'Type' => 'Varchar',
+        'SimplerName' => 'Varchar'
     );
 
     private static $summary_fields = array(
-        'Type' => 'Type',
-        'Title' => 'Title',
-        'Status' => 'Title'
+        'SimplerName' => 'Type',
+        'Title' => 'Value',
+        'Status' => 'Status'
     );
 
     private static $default_sort = 'Status DESC';
@@ -105,6 +106,11 @@ class EcommerceSecurityBaseClass extends DataObject
     function getType()
     {
         return $this->singular_name();
+    }
+
+    function getSimplerName()
+    {
+        return str_replace('Blacklisted ', '', $this->singular_name());
     }
 
     /**
