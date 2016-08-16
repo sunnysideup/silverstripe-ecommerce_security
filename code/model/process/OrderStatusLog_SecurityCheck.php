@@ -344,6 +344,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $html .= $warningMessage;
             }
             $html .= '</ul>';
+        } else {
+            $html .= '<h2>No Blacklisted Data Present</h2>';
         }
         if(count($similarArray)) {
             $days = $this->Config()->get('days_ago_to_check');
