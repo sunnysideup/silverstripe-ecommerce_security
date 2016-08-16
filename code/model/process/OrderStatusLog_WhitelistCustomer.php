@@ -37,6 +37,19 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         return self::$plural_name;
     }
 
+    /**
+     * is a customer whitelisted...?
+     * @param  Member $member
+     * @return boolean
+     */
+    public static function customer_is_whitelist($member)
+    {
+        OrderStatusLog_WhitelistCustomer::get()->filter(array(
+            'WhiteList' => 1,
+            'MemberID' => $member->ID
+        ))->count() ? true : false;
+    }
+
     function canCreate($member = null)
     {
         return false;
@@ -106,6 +119,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
             }
         }
     }
+
 
 
 }

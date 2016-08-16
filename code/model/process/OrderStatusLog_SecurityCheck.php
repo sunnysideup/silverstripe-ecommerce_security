@@ -15,18 +15,18 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     private static $db = array(
         'Risks' => 'HTMLText',
         'SubTotal' => 'Currency',
-        'Check1' => 'Boolean',
-        'Check2' => 'Boolean',
-        'Check3' => 'Boolean',
-        'Check4' => 'Boolean',
-        'Check5' => 'Boolean',
-        'Check6' => 'Boolean',
-        'Check7' => 'Boolean',
-        'Check8' => 'Boolean',
-        'Check9' => 'Boolean',
-        'Check10' => 'Boolean',
-        'Check11' => 'Boolean',
-        'Check12' => 'Boolean',
+        'Check1' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check2' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check3' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check4' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check5' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check6' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check7' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check8' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check9' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check10' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check11' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check12' => 'Enum("To do, Done, Trusted Customer", "To do" )',
     );
 
     /**
@@ -34,11 +34,13 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
      *      array(
      *          Check1 => array(
      *              "Title" => "Customer Has Paid",
-     *              "MinSubTotal" => 10
+     *              "MinSubTotal" => 10,
+     *              "Explanation" => "Check Payment system for $$$ coming in"
      *          ),
      *          Check2 => array(
      *              "Title" => "Address Exists",
-     *              "MinSubTotal" => 50
+     *              "MinSubTotal" => 50,
+     *              "Explanation" => "Check Payment system for $$$ coming in"
      *          )
      *
      * @var array
@@ -85,12 +87,12 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $checks = $this->Config()->get('checks_required');
         $fields->addFieldToTab(
             "Root.Required",
-            HeaderField::create('RequiredChecksHeader',''),
+            HeaderField::create('RequiredChecksHeader', 'Required Checks'),
             'Note'
         );
         $fields->addFieldToTab(
             "Root.NotRequired",
-            HeaderField::create('UnrequiredChecksHeader','Checks that are not required for this order'),
+            HeaderField::create('UnrequiredChecksHeader','Optional Checks'),
             'Note'
         );
         $hasRequiredChecks = false;
@@ -101,24 +103,49 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $hasRequiredChecks = true;
                 $fields->addFieldToTab(
                     'Root.Required',
-                    $fields->dataFieldByName($fieldName)->setTitle($details['Title'])
+                    $myField = $fields->dataFieldByName($fieldName)
                 );
             } else {
                 $hasUnrequiredChecks = true;
                 $fields->addFieldToTab(
                     'Root.NotRequired',
-                    $fields->dataFieldByName($fieldName)->setTitle($details['Title'])
+                    $myField = $fields->dataFieldByName($fieldName)
                 );
+            }
+            $originalOptions = $myField->getSource();
+            if(1 == 1) {
+                unset($originalOptions['Trusted Customer']);
+            } else {
+
+            }
+            $fields->replaceField(
+                $myField->ID(),
+                OptionsetField::create(
+                    $myField->ID(),
+                    $details['Title'],
+                    $originalOptions
+                )
+            );
+            if(! empty($details['Description'])) {
+                $myField->setRighTitle($details['Description']);
             }
         }
         foreach($allFields as $fieldToRemove) {
             $fields->removeByName($fieldToRemove);
         }
-        if( ! $hasUnrequiredChecks) {
-            $fields->removeFieldFromTab('Root.Main','UnrequiredChecksHeader');
+        if( ! $hasUnrequiredChecks || 1 == 1) {
+            $fields->addFieldToTab(
+                "Root.NotRequired",
+                HeaderField::create('UnrequiredChecksHeader','There are no optional checks for this order.'),
+                'Note'
+            );
         }
         if( ! $hasRequiredChecks) {
-            $fields->removeFieldFromTab('Root.Main','RequiredChecksHeader');
+            $fields->addFieldToTab(
+                "Root.Required",
+                HeaderField::create('RequiredChecksHeader', 'There are no required checks for this order.'),
+                'Note'
+            );
         }
         $fields->removeFieldFromTab('Root.Main','AuthorID');
         $fields->removeFieldFromTab('Root.Main','Title');
@@ -147,6 +174,15 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if($member) {
             if($member->Email) {
                 $emailArray[] = $member->Email;
+                $previousOrders = Order::get()
+                    ->filter(
+                        array(
+                            'MemberID' => $member->ID
+                        )
+                    )
+                    ->exclude(
+                        array('ID' => $order->ID)
+                    );
             }
         }
         //are there any orders with the same email in the last seven days...
@@ -303,7 +339,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         }
         $html = '';
         if(count($warningMessages)) {
-            $html .= '<h2>Blacklisted Details</h2><ul class="SecurityCheckListOfRisks warnings">';
+            $html .= '<h2 style="color: red;">Blacklisted Details</h2><ul class="SecurityCheckListOfRisks warnings" style="color: red;">';
             foreach($warningMessages as $warningMessage) {
                 $html .= $warningMessage;
             }
@@ -323,7 +359,25 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         } else {
             $html = '<p class="message good">There were no similar orders in the last '.$days.' days</p>';
         }
-
+        if($previousOrders->count()) {
+            $fields->addFieldToTab(
+                "Root.PreviousOrders",
+                new GridField(
+                    'PreviousOrdersList',
+                    'Previous Orders',
+                    $previousOrders
+                )
+            );
+        }
+        else {
+            $fields->addFieldToTab(
+                "Root.PreviousOrders",
+                HeaderField::create(
+                    'NoPreviousOrders',
+                    'This customer does not have any previous orders'
+                )
+            );
+        }
         return $html;
     }
 
