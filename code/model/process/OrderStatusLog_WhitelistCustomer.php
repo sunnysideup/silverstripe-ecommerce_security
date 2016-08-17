@@ -48,6 +48,23 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
     }
 
     /**
+     *
+     *
+     * @param  Member  $member  the member to check
+     * @return boolean          returns true of the member has been whitelisted before
+     */
+    public static function member_is_whitelisted(Member $member)
+    {
+        return OrderStatusLog_WhitelistCustomer::get()
+            ->filter(
+                array(
+                    'MemberID' => $member->ID,
+                    'Whitelist' => 1
+                )
+            )->count() ? true : false;
+    }
+
+    /**
      * CMS Fields
      * @return FieldList
      */
@@ -56,6 +73,8 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         $fields = parent::getCMSFields();
         return $fields;
     }
+
+
 
     public function checkcustomer()
     {

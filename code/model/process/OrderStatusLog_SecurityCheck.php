@@ -95,6 +95,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         );
         $hasRequiredChecks = false;
         $hasUnrequiredChecks = false;
+        $memberIsWhiteListed = $this->memberIsWhiteListed();
         foreach($checks as $fieldName => $details) {
             unset($allFields[$fieldName]);
             if(floatval($this->SubTotal) > floatval($details['SubTotalMin'])) {
@@ -135,6 +136,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $shippingAddress = $order->ShippingAddress();
         $member = $order->Member();
         $payments = $order->Payments();
+        $html = '';
 
         $similarArray = array();
         $warningMessages = array();
@@ -147,6 +149,9 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if($member) {
             if($member->Email) {
                 $emailArray[] = $member->Email;
+                if(OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
+                    $html .= '<h1 style="background-color: green; color: white;">This customer is whitelisted</h1>';
+                }
             }
         }
         //are there any orders with the same email in the last seven days...
@@ -301,7 +306,6 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
             $similarArray[$otherOrder->ID]["IP"] = $otherOrder;
         }
-        $html = '';
         if(count($warningMessages)) {
             $html .= '<h2>Blacklisted Details</h2><ul class="SecurityCheckListOfRisks warnings">';
             foreach($warningMessages as $warningMessage) {
@@ -323,11 +327,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
             $html .= '</ul>';
         } else {
-            $html = '<p class="message good">There were no similar orders in the last '.$days.' days</p>';
-        }
-        $member = $order->Member();
-        if($member && $member->exists()) {
-            
+            $html .= '<p class="message good">There were no similar orders in the last '.$days.' days</p>';
         }
 
         return $html;
@@ -389,6 +389,26 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if($obj->Status == 'Bad') {
             return false;
         }
+    }
+
+    /**
+     * caching variable only...
+     *
+     * @var null | bool
+     */
+    private $_memberIsWhiteListed = null;
+
+    protected function memberIsWhiteListed() {
+        if($this->_memberIsWhiteListed  === null) {
+            $order = $this->Order();
+            if($order && $order->exists()) {
+                $member = $order->Member();
+                if($member && $member->exists()) {
+                    $this->_memberIsWhiteListed = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
+                }
+            }
+        }
+        return $this->_memberIsWhiteListed;
     }
 
 }
