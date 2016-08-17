@@ -15,18 +15,18 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     private static $db = array(
         'Risks' => 'HTMLText',
         'SubTotal' => 'Currency',
-        'Check1' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check2' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check3' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check4' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check5' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check6' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check7' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check8' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check9' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check10' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check11' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-        'Check12' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
+        'Check1' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check2' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check3' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check4' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check5' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check6' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check7' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check8' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check9' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check10' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check11' => 'Enum("To do, Done, Trusted Customer", "To do" )',
+        'Check12' => 'Enum("To do, Done, Trusted Customer", "To do" )',
     );
 
     /**
@@ -113,11 +113,11 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     $myField = $fields->dataFieldByName($fieldName)
                 );
             }
-            $originalOptions = $myField->getItems();
-            if($memberIsWhiteListed) {
-
+            $originalOptions = $myField->getSource();
+            if(1 == 1) {
+                unset($originalOptions['Trusted Customer']);
             } else {
-                unset($originalOptions['Whitelisted Customer']);
+
             }
             $fields->replaceField(
                 $myField->ID(),
@@ -176,9 +176,11 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if($member) {
             if($member->Email) {
                 $emailArray[] = $member->Email;
+<<<<<<< HEAD
                 if(OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
                     $html .= '<h1 style="background-color: green; color: white;">This customer is whitelisted</h1>';
                 }
+=======
                 $previousOrders = Order::get()
                     ->filter(
                         array(
@@ -188,6 +190,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     ->exclude(
                         array('ID' => $order->ID)
                     );
+>>>>>>> af43d05dbbf88b904521461ecb7381e6b7a923b0
             }
         }
         //are there any orders with the same email in the last seven days...
@@ -363,7 +366,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
             $html .= '</ul>';
         } else {
+<<<<<<< HEAD
             $html .= '<p class="message good">There were no similar orders in the last '.$days.' days</p>';
+=======
+            $html = '<p class="message good">There were no similar orders in the last '.$days.' days</p>';
         }
         if($previousOrders->count()) {
             $fields->addFieldToTab(
@@ -383,6 +389,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     'This customer does not have any previous orders'
                 )
             );
+>>>>>>> af43d05dbbf88b904521461ecb7381e6b7a923b0
         }
         return $html;
     }
