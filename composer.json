@@ -1,32 +1,31 @@
 {
-	"name": "sunnysideup/ecommerce_security",
-	"type": "silverstripe-module",
-	"description": "Add additional security checks to your Silverstripe e-commerce install.",
-	"keywords": [
-		"e-commerce",
-		"CMS",
-		"Silverstripe",
-		"security",
-		"process",
-		"order steps",
-		"order step"
-	],
-	"license": "Sunny Side Up (BSD-3-Clause and CUSTOM)",
-	"authors":[
-		{
-			"name": "Nicolaas Francken",
-			"homepage": "https://github.com/sunnysideup",
-			"email" : "modules@sunnysideup.co.nz",
-			"role" : "lead developer"
-		}
-	],
-	"require":{
-		"silverstripe/framework": "^3.4",
-		"sunnysideup/ecommerce": "dev-master",
-                "burnbright/silverstripe-hasonefield": "*"
-	},
-	"extra": {
-		"installer-name": "ecommerce_security"
-	}
+    "name": "sunnysideup/ecommerce_security",
+    "type": "silverstripe-module",
+    "description": "Add additional security checks to your Silverstripe e-commerce install.",
+    "keywords": [
+        "e-commerce",
+        "CMS",
+        "Silverstripe",
+        "security",
+        "process",
+        "order steps",
+        "order step"
+    ],
+    "license": "Sunny Side Up (BSD-3-Clause and CUSTOM)",
+    "authors":[
+        {
+            "name": "Nicolaas Francken",
+            "homepage": "https://github.com/sunnysideup",
+            "email" : "modules@sunnysideup.co.nz",
+            "role" : "lead developer"
+        }
+    ],
+    "require":{
+        "silverstripe/framework": "^3.4",
+        "sunnysideup/ecommerce": "dev-master"
+    },
+    "extra": {
+        "installer-name": "ecommerce_security"
+    }
 
 }

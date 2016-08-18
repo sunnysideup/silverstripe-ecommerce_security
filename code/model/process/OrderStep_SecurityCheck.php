@@ -102,6 +102,8 @@ class OrderStep_SecurityCheck extends OrderStep implements OrderStepInterface
         return;
     }
 
+    private static $_my_order = null;
+
     /**
      * Allows the opportunity for the Order Step to add any fields to Order::getCMSFields.
      *
@@ -113,12 +115,20 @@ class OrderStep_SecurityCheck extends OrderStep implements OrderStepInterface
     public function addOrderStepFields(FieldList $fields, Order $order)
     {
         $fields = parent::addOrderStepFields($fields, $order);
-        $title = _t('OrderStep.MUSTENTERDISPATCHRECORD', ' ... To move this order to the next step you have to carry out a bunch of security checks.');
+        $title = _t('OrderStep.MUST_ACTION_SECURITY_CHECKS', ' ... To move this order to the next step you have to carry out a bunch of security checks.');
         $field = $order->getOrderStatusLogsTableFieldEditable('OrderStatusLog_SecurityCheck', $title);
-        $fields->addFieldToTab('Root.Next', $field, 'ActionNextStepManually');
+        $logEntry = $this->RelevantLogEntry($order);
+        $link = '/admin/sales/Order/EditForm/field/Order/item/'.$order->ID.'/ItemEditForm/field/OrderStatusLog_SecurityCheck/item/'.$logEntry->ID.'/edit';
+        $button = EcommerceCMSButtonField::create(
+            'OrderStatusLog_SecurityCheck_Button',
+            $link,
+            'Open Security Checks'
+        );
+        $fields->addFieldsToTab('Root.Next', array($button, $field), 'ActionNextStepManually');
 
         return $fields;
     }
+
 
     /**
      * For some ordersteps this returns true...

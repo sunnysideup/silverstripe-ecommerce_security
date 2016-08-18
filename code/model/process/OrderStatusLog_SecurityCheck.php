@@ -47,6 +47,16 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
      */
     private static $checks_required = array();
 
+    private static $summary_fields = array(
+        'Type' => 'Type',
+        'SubTotal' => 'SubTotal',
+        'SecurityCleared' => 'Security Cleared'
+    );
+
+    private static $casting = array(
+        'SecurityCleared' => 'Boolean'
+    );
+
     private static $defaults = array(
         'InternalUseOnly' => true
     );
@@ -79,7 +89,41 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
      */
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
+        $order = $this->Order();
+        if($order) {
+            $member = $order->Member();
+            $fields = parent::getCMSFields();
+            if($member) {
+                $previousOrders = Order::get()
+                    ->filter(
+                        array(
+                            'MemberID' => $member->ID
+                        )
+                    )
+                    ->exclude(
+                        array('ID' => $order->ID)
+                    );
+                if($previousOrders->count()) {
+                    $fields->addFieldToTab(
+                        "Root.PreviousOrders",
+                        new GridField(
+                            'PreviousOrdersList',
+                            'Previous Orders',
+                            $previousOrders
+                        )
+                    );
+                }
+                else {
+                    $fields->addFieldToTab(
+                        "Root.PreviousOrders",
+                        HeaderField::create(
+                            'NoPreviousOrders',
+                            'This customer does not have any previous orders'
+                        )
+                    );
+                }
+            }
+        }
         $allFields = array();
         for($i = 1; $i < 13; $i++) {
             $allFields["Check".$i] = "Check".$i;
@@ -113,11 +157,14 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     $myField = $fields->dataFieldByName($fieldName)
                 );
             }
-            $originalOptions = $myField->getItems();
+            $originalOptions = $myField->getSource();
             if($memberIsWhiteListed) {
-
+                //..
             } else {
                 unset($originalOptions['Whitelisted Customer']);
+            }
+            if(! $this->$fieldName) {
+                $this->$fieldName = 'To do';
             }
             $fields->replaceField(
                 $myField->ID(),
@@ -178,16 +225,9 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $emailArray[] = $member->Email;
                 if(OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
                     $html .= '<h1 style="background-color: green; color: white;">This customer is whitelisted</h1>';
+                } else {
+                    $html .= '<h1>This customer is NOT whitelisted</h1>';
                 }
-                $previousOrders = Order::get()
-                    ->filter(
-                        array(
-                            'MemberID' => $member->ID
-                        )
-                    )
-                    ->exclude(
-                        array('ID' => $order->ID)
-                    );
             }
         }
         //are there any orders with the same email in the last seven days...
@@ -365,26 +405,13 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         } else {
             $html .= '<p class="message good">There were no similar orders in the last '.$days.' days</p>';
         }
-        if($previousOrders->count()) {
-            $fields->addFieldToTab(
-                "Root.PreviousOrders",
-                new GridField(
-                    'PreviousOrdersList',
-                    'Previous Orders',
-                    $previousOrders
-                )
-            );
-        }
-        else {
-            $fields->addFieldToTab(
-                "Root.PreviousOrders",
-                HeaderField::create(
-                    'NoPreviousOrders',
-                    'This customer does not have any previous orders'
-                )
-            );
-        }
+
         return $html;
+    }
+
+    function getSecurityCleared()
+    {
+        return  DBField::create_field('Boolean', ($this->pass() ? true : false));
     }
 
     /**
@@ -408,7 +435,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     user_error('bad field  ....');
                 }
                 // there is a check that needs to be TRUE, but is not ...
-                if( ! $this->$fieldName) {
+                if($this->$fieldName == 'Done' || $this->$fieldName == 'Whitelisted Customer' ) {
+                } else {
                     return false;
                 }
             }

@@ -1,4 +1,4 @@
-<?
+<?php
 
 class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterface
 {
