@@ -223,7 +223,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if($member) {
             if($member->Email) {
                 $emailArray[] = $member->Email;
-                if(OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
+                if(OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member) || 1 == 1) {
                     $html .= '<h1 style="background-color: green; color: white;">This customer is whitelisted</h1>';
                 } else {
                     $html .= '<h1>This customer is NOT whitelisted</h1>';
