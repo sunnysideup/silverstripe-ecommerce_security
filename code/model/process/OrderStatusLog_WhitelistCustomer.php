@@ -87,7 +87,18 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         return $fields;
     }
 
-
+    function onAfterWrite()
+    {
+        parent::onAfterWrite();
+        if($this->Whitelist) {
+            if($member = $this->Member()) {
+                if($member->exists()) {
+                    $member->IsWhitelisted = true;
+                    $member->write();
+                }
+            }
+        }
+    }
 
     public function checkcustomer()
     {
@@ -139,7 +150,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                                 )
                                 ->exclude(
                                     array(
-                                        'OrderID' => $order->ID,
+                                        'ID' => $order->ID,
                                         'CancelledByID:greaterThan' => 0
                                     )
                                 )->count();

@@ -3,6 +3,11 @@ Name: ecommerce_security
 Before: 'mysite/*'
 After: 'framework/*','cms/*','ecommerce/*'
 ---
+
+Member:
+  extensions:
+    - EcommerceSecurityMemberDecoration
+
 SecurityCheck_ModelAdmin:
   managed_models:
     - EcommerceSecurityBaseClass
