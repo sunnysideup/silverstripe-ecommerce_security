@@ -13,10 +13,12 @@ SecurityCheck_ModelAdmin:
     - EcommerceSecurityBaseClass
 
 ---
+After: 'framework/*','cms/*','ecommerce/*','mysite/*'
 Only:
   moduleexists: 'grouped-cms-menu'
 ---
 LeftAndMain:
   menu_groups:
     Shop:
+      priority: -500
       - SecurityCheck_ModelAdmin
