@@ -20,5 +20,4 @@ Only:
 LeftAndMain:
   menu_groups:
     Shop:
-      priority: -500
       - SecurityCheck_ModelAdmin
