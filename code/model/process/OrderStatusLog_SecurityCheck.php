@@ -403,7 +403,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
             $html .= '</ul>';
         } else {
-            $html .= '<p class="message good">There were no similar orders in the last '.$days.' days</p>';
+            $html .= '<p class="message good">There were no similar orders in the last '.$daysAgo.' days</p>';
         }
 
         return $html;
