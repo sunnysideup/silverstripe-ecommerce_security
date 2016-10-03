@@ -23,15 +23,6 @@ class EcommerceSecurityBaseClass extends DataObject
         'Status' => 'Enum("Unknown, Good, Bad", "Unknown")'
     );
 
-    private static $indexes = array(
-        //see requireDefaultRecords ...
-        /*
-        'MyUniqueIndex' => array(
-            'type' => 'unique',
-            'value' => 'ClassName,Title'
-        )*/
-    );
-
     private static $casting = array(
         'Type' => 'Varchar',
         'SimplerName' => 'Varchar'
