@@ -80,7 +80,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
     function canEdit($member = null)
     {
-        return true;
+        return parent::canEdit($member);
     }
 
     /**
