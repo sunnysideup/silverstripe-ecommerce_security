@@ -116,4 +116,9 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
     {
         return 'Whitelist a customer if they qualify for this.';
     }
+    
+    public function HideFromEveryone()
+    {
+        return true;
+    }
 }
