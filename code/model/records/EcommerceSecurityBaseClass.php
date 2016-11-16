@@ -65,7 +65,7 @@ class EcommerceSecurityBaseClass extends DataObject
 
     function canCreate($member = null)
     {
-        return false;
+        return true;
     }
 
     function canDelete($member = null)
@@ -80,17 +80,32 @@ class EcommerceSecurityBaseClass extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $labels = $this->fieldLabels();
-        $fields->addFieldToTab(
-            'Root.Main',
-            $type = ReadonlyField::create('Type', 'Type', $labels['Title']),
-            'Title'
-        );
-        ;
-        $fields->replaceField(
-            'Title',
-            $fields->dataFieldByName('Title')->setTitle($labels["Title"])->performReadonlyTransformation()
-        );
+        if($this->exists()){
+            $labels = $this->fieldLabels();
+            $fields->addFieldToTab(
+                'Root.Main',
+                $type = ReadonlyField::create('Type', 'Type', $labels['Title']),
+                'Title'
+            );
+            $fields->replaceField(
+                'Title',
+                $fields->dataFieldByName('Title')->setTitle($labels["Title"])->performReadonlyTransformation()
+            );
+        }
+        else {
+            $availableClasses = ClassInfo::subclassesFor($this->ClassName);
+            unset($availableClasses[$this->ClassName]);
+            $fields->addFieldToTab(
+                'Root.Main',
+                EcommerceClassNameOrTypeDropdownField::create(
+                    'ClassName',
+                    'Type',
+                    'EcommerceSecurityBaseClass',
+                    $availableClasses
+                )->addExtraClass('dropdown')
+            );
+            $fields->dataFieldByName('Title')->setTitle('Value');
+        }
         return $fields;
     }
 
