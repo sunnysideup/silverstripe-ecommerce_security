@@ -9,7 +9,6 @@
  **/
 class OrderStatusLog_SecurityCheck extends OrderStatusLog
 {
-
     private static $days_ago_to_check = 14;
 
     private static $db = array(
@@ -73,12 +72,12 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         return self::$plural_name;
     }
 
-    function canCreate($member = null)
+    public function canCreate($member = null)
     {
         return false;
     }
 
-    function canEdit($member = null)
+    public function canEdit($member = null)
     {
         return parent::canEdit($member);
     }
@@ -90,10 +89,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     public function getCMSFields()
     {
         $order = $this->Order();
-        if($order) {
+        if ($order) {
             $member = $order->Member();
             $fields = parent::getCMSFields();
-            if($member) {
+            if ($member) {
                 $previousOrders = Order::get()
                     ->filter(
                         array(
@@ -103,7 +102,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     ->exclude(
                         array('ID' => $order->ID)
                     );
-                if($previousOrders->count()) {
+                if ($previousOrders->count()) {
                     $fields->addFieldToTab(
                         "Root.PreviousOrders",
                         new GridField(
@@ -112,8 +111,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                             $previousOrders
                         )
                     );
-                }
-                else {
+                } else {
                     $fields->addFieldToTab(
                         "Root.PreviousOrders",
                         HeaderField::create(
@@ -125,7 +123,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
         }
         $allFields = array();
-        for($i = 1; $i < 13; $i++) {
+        for ($i = 1; $i < 13; $i++) {
             $allFields["Check".$i] = "Check".$i;
         }
         $checks = $this->Config()->get('checks_required');
@@ -136,15 +134,15 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         );
         $fields->addFieldToTab(
             "Root.NotRequired",
-            HeaderField::create('UnrequiredChecksHeader','Optional Checks'),
+            HeaderField::create('UnrequiredChecksHeader', 'Optional Checks'),
             'Note'
         );
         $hasRequiredChecks = false;
         $hasUnrequiredChecks = false;
         $memberIsWhiteListed = $this->memberIsWhiteListed();
-        foreach($checks as $fieldName => $details) {
+        foreach ($checks as $fieldName => $details) {
             unset($allFields[$fieldName]);
-            if(floatval($this->SubTotal) > floatval($details['SubTotalMin'])) {
+            if (floatval($this->SubTotal) > floatval($details['SubTotalMin'])) {
                 $hasRequiredChecks = true;
                 $fields->addFieldToTab(
                     'Root.Required',
@@ -158,12 +156,12 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 );
             }
             $originalOptions = $myField->getSource();
-            if($memberIsWhiteListed) {
+            if ($memberIsWhiteListed) {
                 //..
             } else {
                 unset($originalOptions['Whitelisted Customer']);
             }
-            if(! $this->$fieldName) {
+            if (! $this->$fieldName) {
                 $this->$fieldName = 'To do';
             }
             $fields->replaceField(
@@ -174,30 +172,30 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     $originalOptions
                 )
             );
-            if(! empty($details['Description'])) {
+            if (! empty($details['Description'])) {
                 $myField->setRighTitle($details['Description']);
             }
         }
-        foreach($allFields as $fieldToRemove) {
+        foreach ($allFields as $fieldToRemove) {
             $fields->removeByName($fieldToRemove);
         }
-        if( ! $hasUnrequiredChecks || 1 == 1) {
+        if (! $hasUnrequiredChecks || 1 == 1) {
             $fields->addFieldToTab(
                 "Root.NotRequired",
-                HeaderField::create('UnrequiredChecksHeader','There are no optional checks for this order.'),
+                HeaderField::create('UnrequiredChecksHeader', 'There are no optional checks for this order.'),
                 'Note'
             );
         }
-        if( ! $hasRequiredChecks) {
+        if (! $hasRequiredChecks) {
             $fields->addFieldToTab(
                 "Root.Required",
                 HeaderField::create('RequiredChecksHeader', 'There are no required checks for this order.'),
                 'Note'
             );
         }
-        $fields->removeFieldFromTab('Root.Main','AuthorID');
-        $fields->removeFieldFromTab('Root.Main','Title');
-        $fields->removeFieldFromTab('Root.Main','InternalUseOnly');
+        $fields->removeFieldFromTab('Root.Main', 'AuthorID');
+        $fields->removeFieldFromTab('Root.Main', 'Title');
+        $fields->removeFieldFromTab('Root.Main', 'InternalUseOnly');
         $fields->makeFieldReadonly('Risks');
         $fields->makeFieldReadonly('SubTotal');
         return $fields;
@@ -220,10 +218,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
         //check emails from user
         $emailArray = array();
-        if($member) {
-            if($member->Email) {
+        if ($member) {
+            if ($member->Email) {
                 $emailArray[] = $member->Email;
-                if(OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
+                if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
                     $html .= '<h1 style="background-color: green; color: white; font-size: 20px; padding: 5px;">This customer is whitelisted</h1>';
                 } else {
                     $html .= '<h1>This customer is NOT whitelisted</h1>';
@@ -234,23 +232,23 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $otherOrders = Order::get()->filter(
             array('MemberID' => $member->ID) + $timeFilter
         )->exclude(array('ID' => $order->ID));
-        foreach($otherOrders as $otherOrder) {
-            if(!isset($similarArray[$otherOrder->ID])) {
+        foreach ($otherOrders as $otherOrder) {
+            if (!isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = array();
             }
             $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
         }
         //check emails from billing address
         $emailArray = array();
-        if($billingAddress) {
-            if($billingAddress->Email) {
+        if ($billingAddress) {
+            if ($billingAddress->Email) {
                 $emailArray[] = $billingAddress->Email;
             }
         }
-        foreach($emailArray as $email) {
-            if($email) {
+        foreach ($emailArray as $email) {
+            if ($email) {
                 $obj = EcommerceSecurityEmail::find_or_create(array("Title" => $email));
-                if($obj->hasRisks()) {
+                if ($obj->hasRisks()) {
                     $warningMessages[] = "<li><strong>EMAIL:</strong> $email<li>";
                 }
             }
@@ -259,9 +257,9 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $otherBillingAddresses = BillingAddress::get()->filter(
             array('Email' => $emailArray) + $timeFilter
         )->exclude(array('OrderID' => $order->ID));
-        foreach($otherBillingAddresses as $address) {
+        foreach ($otherBillingAddresses as $address) {
             $otherOrder = $address->Order();
-            if(!isset($similarArray[$otherOrder->ID])) {
+            if (!isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = array();
             }
             $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
@@ -269,13 +267,13 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
         //phones
         $phoneArray = array();
-        if($billingAddress) {
-            if($billingAddress->Phone) {
+        if ($billingAddress) {
+            if ($billingAddress->Phone) {
                 $phoneArray[] = $billingAddress->Phone;
             }
         }
-        if($shippingAddress) {
-            if($shippingAddress->ShippingPhone) {
+        if ($shippingAddress) {
+            if ($shippingAddress->ShippingPhone) {
                 $phoneArray[] = $shippingAddress->ShippingPhone;
             }
         }
@@ -283,10 +281,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $otherBillingAddresses = BillingAddress::get()->filter(
             array('Phone' => $phoneArray) + $timeFilter
         )->exclude(array('OrderID' => $order->ID));
-        foreach($otherBillingAddresses as $address) {
+        foreach ($otherBillingAddresses as $address) {
             $otherOrder = $address->Order();
-            if($otherOrder && $otherOrder->ID != $order->ID) {
-                if(!isset($similarArray[$otherOrder->ID])) {
+            if ($otherOrder && $otherOrder->ID != $order->ID) {
+                if (!isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = array();
                 }
                 $similarArray[$otherOrder->ID]["Phone"] = $otherOrder;
@@ -295,10 +293,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $otherShippingAddresses = ShippingAddress::get()->filter(
             array('ShippingPhone' => $phoneArray) + $timeFilter
         )->exclude(array('OrderID' => $order->ID));
-        foreach($otherShippingAddresses as $address) {
+        foreach ($otherShippingAddresses as $address) {
             $otherOrder = $address->Order();
-            if($otherOrder && $otherOrder->ID != $order->ID) {
-                if(!isset($similarArray[$otherOrder->ID])) {
+            if ($otherOrder && $otherOrder->ID != $order->ID) {
+                if (!isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = array();
                 }
                 $similarArray[$otherOrder->ID]["Phone"] = $otherOrder;
@@ -307,13 +305,13 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
         //addresses
         $addressArray = array();
-        if($billingAddress) {
-            if($billingAddress->Address) {
+        if ($billingAddress) {
+            if ($billingAddress->Address) {
                 $addressArray[] = $billingAddress->Address;
             }
         }
-        if($shippingAddress) {
-            if($shippingAddress->ShippingAddress) {
+        if ($shippingAddress) {
+            if ($shippingAddress->ShippingAddress) {
                 $addressArray[] = $shippingAddress->ShippingAddress;
             }
         }
@@ -321,10 +319,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $otherBillingAddresses = BillingAddress::get()->filter(
             array('Address' => $addressArray) + $timeFilter
         )->exclude(array('OrderID' => $order->ID));
-        foreach($otherBillingAddresses as $address) {
+        foreach ($otherBillingAddresses as $address) {
             $otherOrder = $address->Order();
-            if($otherOrder && $otherOrder->ID != $order->ID) {
-                if(!isset($similarArray[$otherOrder->ID])) {
+            if ($otherOrder && $otherOrder->ID != $order->ID) {
+                if (!isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = array();
                 }
                 $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
@@ -335,10 +333,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 array('ShippingAddress' => $addressArray) + $timeFilter
             )
             ->exclude(array('OrderID' => $order->ID));
-        foreach($otherShippingAddresses as $address) {
+        foreach ($otherShippingAddresses as $address) {
             $otherOrder = $address->Order();
-            if($otherOrder && $otherOrder->ID != $order->ID) {
-                if(!isset($similarArray[$otherOrder->ID])) {
+            if ($otherOrder && $otherOrder->ID != $order->ID) {
+                if (!isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = array();
                 }
                 $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
@@ -349,25 +347,25 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         //IP
         $ipArray = array();
         $ipProxyArray = array();
-        if($payments) {
-            foreach($payments as $payment) {
+        if ($payments) {
+            foreach ($payments as $payment) {
                 $ipArray[] = $payment->IP;
                 $ipProxyArray[] = $payment->ProxyIP;
             }
         }
         //are there any orders with the same IP in the xxx seven days...
-        foreach($ipArray as $ip) {
-            if($ip) {
+        foreach ($ipArray as $ip) {
+            if ($ip) {
                 $obj = EcommerceSecurityIP::find_or_create(array("Title" => $ip));
-                if($obj->hasRisks()) {
+                if ($obj->hasRisks()) {
                     $warningMessages[] = "<li><strong>IP:</strong> $ip<li>";
                 }
             }
         }
-        foreach($ipProxyArray as $proxyIP) {
-            if($proxyIP) {
+        foreach ($ipProxyArray as $proxyIP) {
+            if ($proxyIP) {
                 $obj = EcommerceSecurityProxyIP::find_or_create(array("Title" => $proxyIP));
-                if($obj->hasRisks()) {
+                if ($obj->hasRisks()) {
                     $warningMessages[] = "<li><strong>PROXY IP:</strong> $proxyIP<li>";
                 }
             }
@@ -375,28 +373,28 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $otherPayments = EcommercePayment::get()->filter(
             array('IP' => $ipArray) + $timeFilter
         )->exclude(array('OrderID' => $order->ID));
-        foreach($otherPayments as $payment) {
+        foreach ($otherPayments as $payment) {
             $otherOrder = $payment->Order();
-            if(!isset($similarArray[$otherOrder->ID])) {
+            if (!isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = array();
             }
             $similarArray[$otherOrder->ID]["IP"] = $otherOrder;
         }
-        if(count($warningMessages)) {
+        if (count($warningMessages)) {
             $html .= '<h2 style="color: red;">Blacklisted Details</h2><ul class="SecurityCheckListOfRisks warnings" style="color: red;">';
-            foreach($warningMessages as $warningMessage) {
+            foreach ($warningMessages as $warningMessage) {
                 $html .= $warningMessage;
             }
             $html .= '</ul>';
         } else {
             $html .= '<h2>No Blacklisted Data Present</h2>';
         }
-        if(count($similarArray)) {
+        if (count($similarArray)) {
             $days = $this->Config()->get('days_ago_to_check');
             $html .= '<h2>Similar orders in the last '.$days.' days</h2><ul class="SecurityCheckListOfRisks otherRisks">';
-            foreach($similarArray as $orderID => $fields) {
+            foreach ($similarArray as $orderID => $fields) {
                 //we just loop this so we can get the order ...
-                foreach($fields as $tempOrder) {
+                foreach ($fields as $tempOrder) {
                     break;
                 }
                 $html .= '<li><a href="'.$tempOrder->CMSEditLink().'">'.$tempOrder->getTitle().'</a>: with same '.implode(', and with same ', array_keys($fields)).'</li>';
@@ -409,7 +407,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         return $html;
     }
 
-    function getSecurityCleared()
+    public function getSecurityCleared()
     {
         return  DBField::create_field('Boolean', ($this->pass() ? true : false));
     }
@@ -421,21 +419,21 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
      * @param  Order $order
      * @return bool
      */
-    function pass()
+    public function pass()
     {
         $order = $this->Order();
-        if( ! $order) {
+        if (! $order) {
             return false;
         }
         $checks = $this->Config()->get('checks_required');
         $fieldsAvailable = $this->stat('db');
-        foreach($checks as $fieldName => $fieldDetails) {
-            if(floatval($this->SubTotal) > floatval($fieldDetails['SubTotalMin'])) {
-                if(! isset($fieldsAvailable[$fieldName])) {
+        foreach ($checks as $fieldName => $fieldDetails) {
+            if (floatval($this->SubTotal) > floatval($fieldDetails['SubTotalMin'])) {
+                if (! isset($fieldsAvailable[$fieldName])) {
                     user_error('bad field  ....');
                 }
                 // there is a check that needs to be TRUE, but is not ...
-                if($this->$fieldName == 'Done' || $this->$fieldName == 'Whitelisted Customer' ) {
+                if ($this->$fieldName == 'Done' || $this->$fieldName == 'Whitelisted Customer') {
                 } else {
                     return false;
                 }
@@ -447,18 +445,17 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
     private static $_saved_already = false;
 
-    function onAfterWrite()
+    public function onAfterWrite()
     {
         parent::onAfterWrite();
-        if( ! self::$_saved_already) {
+        if (! self::$_saved_already) {
             self::$_saved_already = true;
             $order = $this->Order();
-            if($order && $order->exists()) {
+            if ($order && $order->exists()) {
                 $this->SubTotal = $order->getSubTotal();
                 $this->Risks = $this->collateRisks();
                 $this->write();
-            }
-            else {
+            } else {
                 $this->SubTotal = 9999;
                 $this->Risks = "Error";
                 $this->write();
@@ -468,7 +465,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
     protected function checkSecurityObject($obj)
     {
-        if($obj->Status == 'Bad') {
+        if ($obj->Status == 'Bad') {
             return false;
         }
     }
@@ -480,17 +477,17 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
      */
     private $_memberIsWhiteListed = null;
 
-    protected function memberIsWhiteListed() {
-        if($this->_memberIsWhiteListed  === null) {
+    protected function memberIsWhiteListed()
+    {
+        if ($this->_memberIsWhiteListed  === null) {
             $order = $this->Order();
-            if($order && $order->exists()) {
+            if ($order && $order->exists()) {
                 $member = $order->Member();
-                if($member && $member->exists()) {
+                if ($member && $member->exists()) {
                     $this->_memberIsWhiteListed = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
                 }
             }
         }
         return $this->_memberIsWhiteListed;
     }
-
 }

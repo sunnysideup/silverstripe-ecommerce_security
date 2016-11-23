@@ -2,7 +2,6 @@
 
 class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterface
 {
-
     private static $defaults = array(
         'CustomerCanEdit' => 0,
         'CustomerCanCancel' => 0,
@@ -41,7 +40,7 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
     public function initStep(Order $order)
     {
         $logCount = $this->RelevantLogEntries($order)->count();
-        if($logCount) {
+        if ($logCount) {
             //do nothing
         } else {
             $className = $this->relevantLogEntryClassName;
@@ -68,7 +67,7 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
      **/
     public function doStep(Order $order)
     {
-        if(self::$_passed !== null) {
+        if (self::$_passed !== null) {
             return self::$_passed;
         }
         if ($entry = $this->RelevantLogEntry($order)) {

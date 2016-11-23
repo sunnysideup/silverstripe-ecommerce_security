@@ -10,13 +10,19 @@ class EcommerceSecurityBaseClass extends DataObject
      * @Var String
      */
     private static $singular_name = "Blacklisted Item";
-        function i18n_singular_name() { return $this->Config()->get('singular_name');}
+    public function i18n_singular_name()
+    {
+        return $this->Config()->get('singular_name');
+    }
     /**
      * standard SS variable
      * @Var String
      */
     private static $plural_name = "Blacklisted Items";
-        function i18n_plural_name() { return $this->Config()->get('plural_name');}
+    public function i18n_plural_name()
+    {
+        return $this->Config()->get('plural_name');
+    }
 
     private static $db = array(
         'Title' => 'Varchar(200)',
@@ -50,25 +56,25 @@ class EcommerceSecurityBaseClass extends DataObject
     public static function find_or_create($filterArray, $write = true)
     {
         $className = get_called_class();
-        if(empty($filterArray['Title'])) {
+        if (empty($filterArray['Title'])) {
             return EcommerceSecurityBaseClass::create();
         }
         $obj = $className::get()->filter($filterArray)->first();
-        if( ! $obj) {
+        if (! $obj) {
             $obj = $className::create($filterArray);
-            if($write) {
+            if ($write) {
                 $obj->write();
             }
         }
         return $obj;
     }
 
-    function canCreate($member = null)
+    public function canCreate($member = null)
     {
         return true;
     }
 
-    function canDelete($member = null)
+    public function canDelete($member = null)
     {
         return false;
     }
@@ -80,7 +86,7 @@ class EcommerceSecurityBaseClass extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        if($this->exists()){
+        if ($this->exists()) {
             $labels = $this->fieldLabels();
             $fields->addFieldToTab(
                 'Root.Main',
@@ -91,8 +97,7 @@ class EcommerceSecurityBaseClass extends DataObject
                 'Title',
                 $fields->dataFieldByName('Title')->setTitle($labels["Title"])->performReadonlyTransformation()
             );
-        }
-        else {
+        } else {
             $availableClasses = ClassInfo::subclassesFor($this->ClassName);
             unset($availableClasses[$this->ClassName]);
             $fields->addFieldToTab(
@@ -109,12 +114,12 @@ class EcommerceSecurityBaseClass extends DataObject
         return $fields;
     }
 
-    function getType()
+    public function getType()
     {
         return $this->singular_name();
     }
 
-    function getSimplerName()
+    public function getSimplerName()
     {
         return str_replace('Blacklisted ', '', $this->singular_name());
     }
@@ -149,22 +154,20 @@ class EcommerceSecurityBaseClass extends DataObject
         return $this->Status !== 'Unknown' ? true : false;
     }
 
-    function requireDefaultRecords()
+    public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
         $rows = DB::query('SHOW INDEX FROM EcommerceSecurityBaseClass WHERE Key_name = \'MyUniqueIndex\';');
         $count = 0;
-        foreach($rows as $row) {
+        foreach ($rows as $row) {
             $count++;
         }
-        if( ! $count) {
+        if (! $count) {
             DB::query('
                 ALTER TABLE "EcommerceSecurityBaseClass" ADD unique "MyUniqueIndex" ("ClassName","Title")
             ');
-        }
-        else if($count !== 2) {
+        } elseif ($count !== 2) {
             user_error('EcommerceSecurityBaseClass.MyUniqueIndex not set correctly.');
         }
     }
-
 }
