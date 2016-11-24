@@ -9,7 +9,6 @@
  **/
 class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
 {
-
     private static $minimum_days_before_considered = 90;
 
     private static $db = array(
@@ -50,12 +49,12 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         ))->count() ? true : false;
     }
 
-    function canCreate($member = null)
+    public function canCreate($member = null)
     {
         return false;
     }
 
-    function canEdit($member = null)
+    public function canEdit($member = null)
     {
         return true;
     }
@@ -87,12 +86,12 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         return $fields;
     }
 
-    function onAfterWrite()
+    public function onAfterWrite()
     {
         parent::onAfterWrite();
-        if($this->Whitelist) {
-            if($member = $this->Member()) {
-                if($member->exists()) {
+        if ($this->Whitelist) {
+            if ($member = $this->Member()) {
+                if ($member->exists()) {
                     $member->IsWhitelisted = true;
                     $member->write();
                 }
@@ -103,12 +102,12 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
     public function checkcustomer()
     {
         $order = $this->Order();
-        if($order && $order->exists()) {
-            if($order->MemberID) {
+        if ($order && $order->exists()) {
+            if ($order->MemberID) {
                 $this->MemberID = $order->MemberID;
                 $this->Whitelist = false;
                 $member = $order->Member();
-                if($member && $member->exists()) {
+                if ($member && $member->exists()) {
                     //check if member has previouly been whitelisted
                     $previousOne = OrderStatusLog_WhitelistCustomer::get()
                         ->filter(
@@ -120,7 +119,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                         ->exclude(
                             array('OrderID' => $order->ID)
                         )->first();
-                    if($previousOne) {
+                    if ($previousOne) {
                         $this->Whitelist = true;
                         $this->BasedOnID = $previousOne->ID;
                     } else {
@@ -136,10 +135,9 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                             ->exclude(
                                 array('OrderID' => $order->ID)
                             )->first();
-                        if($previousOne) {
+                        if ($previousOne) {
                             $this->Whitelist = true;
                             $this->BasedOnID = $previousOne->ID;
-
                         } else {
                             $previousOrders = Order::get()
                                 ->filter(
@@ -162,7 +160,4 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
             }
         }
     }
-
-
-
 }
