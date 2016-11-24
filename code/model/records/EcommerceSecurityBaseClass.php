@@ -74,6 +74,38 @@ class EcommerceSecurityBaseClass extends DataObject
         return true;
     }
 
+    public function canView($member = null)
+    {
+        if (! $member) {
+            $member = Member::currentUser();
+        }
+        $extended = $this->extendedCan(__FUNCTION__, $member);
+        if ($extended !== null) {
+            return $extended;
+        }
+        if (Permission::checkMember($member, Config::inst()->get('EcommerceRole', 'admin_permission_code'))) {
+            return true;
+        }
+
+        return parent::canView($member);
+    }
+
+    public function canEdit($member = null)
+    {
+        if (! $member) {
+            $member = Member::currentUser();
+        }
+        $extended = $this->extendedCan(__FUNCTION__, $member);
+        if ($extended !== null) {
+            return $extended;
+        }
+        if (Permission::checkMember($member, Config::inst()->get('EcommerceRole', 'admin_permission_code'))) {
+            return true;
+        }
+
+        return parent::canEdit($member);
+    }
+
     public function canDelete($member = null)
     {
         return false;
