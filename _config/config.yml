@@ -1,7 +1,11 @@
 ---
 Name: ecommerce_security
-Before: 'mysite/*'
-After: 'framework/*','cms/*','ecommerce/*'
+Before:
+  - 'mysite/*'
+After:
+  - 'framework/*'
+  - 'cms/*'
+  - 'ecommerce/*'
 ---
 
 Member:
@@ -12,8 +16,17 @@ SecurityCheck_ModelAdmin:
   managed_models:
     - EcommerceSecurityBaseClass
 
+
+EcommerceRole:
+  admin_role_permission_codes:
+    - CMS_ACCESS_SecurityCheck_ModelAdmin
+
 ---
-After: 'framework/*','cms/*','ecommerce/*','mysite/*'
+After:
+  - 'framework/*'
+  - 'cms/*'
+  - 'ecommerce/*'
+  - 'mysite/*'
 Only:
   moduleexists: 'grouped-cms-menu'
 ---
