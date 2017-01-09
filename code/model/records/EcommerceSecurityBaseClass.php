@@ -12,7 +12,7 @@ class EcommerceSecurityBaseClass extends DataObject
     private static $singular_name = "Blacklisted Item";
     public function i18n_singular_name()
     {
-        return $this->Config()->get('singular_name');
+        return Config::inst()->get($this->ClassName, 'singular_name');
     }
     /**
      * standard SS variable
@@ -21,12 +21,16 @@ class EcommerceSecurityBaseClass extends DataObject
     private static $plural_name = "Blacklisted Items";
     public function i18n_plural_name()
     {
-        return $this->Config()->get('plural_name');
+        return Config::inst()->get($this->ClassName, 'plural_name');
     }
 
     private static $db = array(
         'Title' => 'Varchar(200)',
         'Status' => 'Enum("Unknown, Good, Bad", "Unknown")'
+    );
+
+    private static $belongs_many_many = array(
+        'SecurityChecks' => 'OrderStatusLog_SecurityCheck'
     );
 
     private static $casting = array(
@@ -38,6 +42,12 @@ class EcommerceSecurityBaseClass extends DataObject
         'SimplerName' => 'Type',
         'Title' => 'Value',
         'Status' => 'Status'
+    );
+
+    private static $indexes = array(
+        'ClassName_Title' => array('type' => 'unique', 'value' => '"ClassName","Title"'),
+        'Title' => true,
+        'ClassName' => true,
     );
 
     private static $default_sort = 'Status DESC';
@@ -56,16 +66,20 @@ class EcommerceSecurityBaseClass extends DataObject
     public static function find_or_create($filterArray, $write = true)
     {
         $className = get_called_class();
+        //we dont want empty ones so we just return a temp object...
         if (empty($filterArray['Title'])) {
-            return EcommerceSecurityBaseClass::create();
-        }
-        $obj = $className::get()->filter($filterArray)->first();
-        if (! $obj) {
-            $obj = $className::create($filterArray);
-            if ($write) {
-                $obj->write();
+            $obj = EcommerceSecurityBaseClass::create();
+        } else {
+            $filterArray['ClassName'] = $className;
+            $obj = $className::get()->filter($filterArray)->first();
+            if (! $obj) {
+                $obj = $className::create($filterArray);
+                if ($write) {
+                    $obj->write();
+                }
             }
         }
+        
         return $obj;
     }
 
@@ -163,7 +177,7 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     public function hasRisks()
     {
-        return $this->Status == 'Bad' ? true : false;
+        return $this->Title && $this->ID && $this->Status == 'Bad' ? true : false;
     }
 
     /**
@@ -189,17 +203,5 @@ class EcommerceSecurityBaseClass extends DataObject
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
-        $rows = DB::query('SHOW INDEX FROM EcommerceSecurityBaseClass WHERE Key_name = \'MyUniqueIndex\';');
-        $count = 0;
-        foreach ($rows as $row) {
-            $count++;
-        }
-        if (! $count) {
-            DB::query('
-                ALTER TABLE "EcommerceSecurityBaseClass" ADD unique "MyUniqueIndex" ("ClassName","Title")
-            ');
-        } elseif ($count !== 2) {
-            user_error('EcommerceSecurityBaseClass.MyUniqueIndex not set correctly.');
-        }
     }
 }

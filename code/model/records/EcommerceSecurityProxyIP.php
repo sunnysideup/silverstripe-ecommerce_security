@@ -10,19 +10,12 @@ class EcommerceSecurityProxyIP extends EcommerceSecurityBaseClass
      * @Var String
      */
     private static $singular_name = "Blacklisted Proxy IP Address";
-    public function i18n_singular_name()
-    {
-        return $this->Config()->get('singular_name');
-    }
+
     /**
      * standard SS variable
      * @Var String
      */
     private static $plural_name = "Blacklisted Proxy IP Addresses";
-    public function i18n_plural_name()
-    {
-        return $this->Config()->get('plural_name');
-    }
 
     private static $field_labels = array(
         'Title' => 'ProxyIP'
