@@ -9,7 +9,10 @@
  **/
 class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
 {
-    private static $minimum_days_before_considered = 90;
+    /**
+     * @var int
+     */
+    private static $min_number_of_paid_orders_required = 1;
 
     private static $db = array(
         'Whitelist' => 'Boolean'
@@ -36,19 +39,6 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         return self::$plural_name;
     }
 
-    /**
-     * is a customer whitelisted...?
-     * @param  Member $member
-     * @return boolean
-     */
-    public static function customer_is_whitelist($member)
-    {
-        OrderStatusLog_WhitelistCustomer::get()->filter(array(
-            'WhiteList' => 1,
-            'MemberID' => $member->ID
-        ))->count() ? true : false;
-    }
-
     public function canCreate($member = null)
     {
         return false;
@@ -56,7 +46,33 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
 
     public function canEdit($member = null)
     {
-        return true;
+        return parent::canEdit($member);
+    }
+
+    public function canDelete($member = null)
+    {
+        return false;
+    }
+
+    public function getCMSFields() {
+        $fields = parent::getCMSFields();
+        $fields->replaceField(
+            'BasedOnID',
+            CMSEditLinkField::create(
+                'BasedOnID',
+                _t('OrderStatusLog_WhitelistCustomer.BASED_ON', 'Based on'),
+                $this->BasedOn()
+            )
+        );
+        $fields->replaceField(
+            'MemberID',
+            CMSEditLinkField::create(
+                'MemberID',
+                _t('OrderStatusLog_WhitelistCustomer.CUSTOMER', 'Customer'),
+                $this->Member()
+            )
+        );
+        return $fields;
     }
 
     /**
@@ -76,16 +92,6 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
             )->count() ? true : false;
     }
 
-    /**
-     * CMS Fields
-     * @return FieldList
-     */
-    public function getCMSFields()
-    {
-        $fields = parent::getCMSFields();
-        return $fields;
-    }
-
     public function onAfterWrite()
     {
         parent::onAfterWrite();
@@ -99,8 +105,12 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         }
     }
 
-    public function checkcustomer()
+    public function assessCustomer()
     {
+        //already done ...
+        if($this->Whitelist) {
+            return true;
+        }
         $order = $this->Order();
         if ($order && $order->exists()) {
             if ($order->MemberID) {
@@ -123,13 +133,12 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                         $this->Whitelist = true;
                         $this->BasedOnID = $previousOne->ID;
                     } else {
-                        //member placed successful order, at least xxx days ago...
-                        $daysAgo = $this->Config()->get('minimum_days_before_considered');
+
+                        //member is already whitelisted
                         $previousOne = OrderStatusLog_WhitelistCustomer::get()
                             ->filter(
                                 array(
-                                    'MemberID' => $member->ID,
-                                    'Created:LessThan' => date('Y-m-d', strtotime('-'.$daysAgo.' days')).' 00:00:00'
+                                    'MemberID' => $member->ID
                                 )
                             )
                             ->exclude(
@@ -139,20 +148,30 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                             $this->Whitelist = true;
                             $this->BasedOnID = $previousOne->ID;
                         } else {
+                            //member has placed orders before
                             $previousOrders = Order::get()
                                 ->filter(
                                     array(
                                         'MemberID' => $member->ID,
-                                        'Created:LessThan' => date('Y-m-d', strtotime('-'.$daysAgo.' days')).' 00:00:00'
+                                        'CancelledByID' => 0
                                     )
                                 )
                                 ->exclude(
                                     array(
-                                        'ID' => $order->ID,
-                                        'CancelledByID:greaterThan' => 0
+                                        'ID' => $order->ID
                                     )
-                                )->count();
-                            $this->Whitelist = false;
+                                );
+                            $count = 0;
+                            $minOrdersRequired = $this->Config()->get('min_number_of_paid_orders_required');
+                            foreach($previousOrders as $previousOrder) {
+                                if($previousOrder->IsPaid()) {
+                                    $count++;
+                                    if($count >= $minOrdersRequired) {
+                                        $this->Whitelist = true;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }

@@ -144,7 +144,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         );
         $hasRequiredChecks = false;
         $hasUnrequiredChecks = false;
-        $memberIsWhiteListed = $this->memberIsWhiteListed();
+        $memberIsWhitelisted = $this->memberIsWhitelisted();
         foreach ($checks as $fieldName => $details) {
             unset($allFields[$fieldName]);
             if (floatval($this->SubTotal) > floatval($details['SubTotalMin'])) {
@@ -161,7 +161,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 );
             }
             $originalOptions = $myField->getSource();
-            if ($memberIsWhiteListed) {
+            if ($memberIsWhitelisted) {
                 //..
             } else {
                 unset($originalOptions['Whitelisted Customer']);
@@ -493,20 +493,20 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
      *
      * @var null | bool
      */
-    private $_memberIsWhiteListed = null;
+    private $_memberIsWhitelisted = null;
 
-    protected function memberIsWhiteListed()
+    protected function memberIsWhitelisted()
     {
-        if ($this->_memberIsWhiteListed  === null) {
+        if ($this->_memberIsWhitelisted  === null) {
             $order = $this->Order();
             if ($order && $order->exists()) {
                 $member = $order->Member();
                 if ($member && $member->exists()) {
-                    $this->_memberIsWhiteListed = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
+                    $this->_memberIsWhitelisted = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
                 }
             }
         }
-        return $this->_memberIsWhiteListed;
+        return $this->_memberIsWhitelisted;
     }
 
     protected function blacklistCheck($arrayOfValues, $securityClass)

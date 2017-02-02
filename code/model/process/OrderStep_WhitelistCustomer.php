@@ -27,7 +27,7 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
     }
 
     /**
-     *initStep:
+     * initStep:
      * makes sure the step is ready to run.... (e.g. check if the order is ready to be emailed as receipt).
      * should be able to run this function many times to check if the step is ready.
      *
@@ -39,22 +39,19 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
      **/
     public function initStep(Order $order)
     {
-        $logCount = $this->RelevantLogEntries($order)->count();
-        if ($logCount) {
-            //do nothing
-        } else {
-            $className = $this->relevantLogEntryClassName;
-            $object = $className::create();
-            $object->OrderID = $order->ID;
-            $object->write();
-        }
+
         return true;
     }
 
-    private static $_passed = null;
+    /**
+     *
+     *
+     * @var null | bool
+     */
+    private $_completed = null;
 
     /**
-     *doStep:
+     * doStep:
      * should only be able to run this function once
      * (init stops you from running it twice - in theory....)
      * runs the actual step.
@@ -67,14 +64,20 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
      **/
     public function doStep(Order $order)
     {
-        if (self::$_passed !== null) {
-            return self::$_passed;
+        if ($this->_completed !== null) {
+            return $this->_completed;
         }
-        if ($entry = $this->RelevantLogEntry($order)) {
-            $entry->checkCustomer();
-            self::$_passed = true;
-            return self::$_passed;
+        $entry = $this->RelevantLogEntry($order);
+        if ( ! $entry) {
+            $className = $this->relevantLogEntryClassName;
+            $entry = $className::create();
+            $entry->OrderID = $order->ID;
+            $entry->write();
         }
+        $entry->assessCustomer();
+        $this->_completed = true;
+
+        return $this->_completed;
     }
 
     /**
@@ -115,7 +118,7 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
     {
         return 'Whitelist a customer if they qualify for this.';
     }
-    
+
     public function HideFromEveryone()
     {
         return true;
