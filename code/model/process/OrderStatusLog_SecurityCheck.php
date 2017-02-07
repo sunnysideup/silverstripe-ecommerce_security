@@ -97,6 +97,24 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if ($order) {
             $member = $order->Member();
             $fields = parent::getCMSFields();
+            $fields->addFieldToTab(
+                'Root.Main',
+                HeaderField::create(
+                    'BadHeading',
+                    'Mark as Fraud'
+                ),
+                'Bad'
+            );
+            $fields->addFieldToTab(
+                'Root.Main',
+                HeaderField::create(
+                    'BadHeading',
+                    'Risks'
+                ),
+                'Risks'
+            );
+            $riskField = $fields->dataFieldByName('Risks');
+            $riskField->setTitle('');
             if ($member) {
                 $previousOrders = Order::get()
                     ->filter(
