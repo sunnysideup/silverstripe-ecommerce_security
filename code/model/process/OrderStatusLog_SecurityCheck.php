@@ -65,6 +65,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         'InternalUseOnly' => true
     );
 
+    private static $field_labels = array(
+        'Bad' => 'Fraudulent'
+    );
+
     private static $singular_name = 'Security Check';
     public function i18n_singular_name()
     {
@@ -202,7 +206,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         foreach ($allFields as $fieldToRemove) {
             $fields->removeByName($fieldToRemove);
         }
-        if (! $hasUnrequiredChecks || 1 == 1) {
+        if (! $hasUnrequiredChecks) {
             $fields->addFieldToTab(
                 "Root.NotRequired",
                 HeaderField::create('UnrequiredChecksHeader', 'There are no optional checks for this order.'),
@@ -247,16 +251,22 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             if ($member->Email) {
                 $emailArray[] = $member->Email;
                 if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
-                    $html .= '<h2 style="background-color: green; color: white; font-size: 20px; padding: 5px;">This customer is whitelisted</h2>';
+                    $html .= '<h4 style="background-color: green; color: white; font-size: 20px; padding: 5px;">This customer is whitelisted</h4>';
                 } else {
-                    $html .= '<h2>This customer is NOT whitelisted</h2>';
+                    $html .= '<h4>This customer is NOT whitelisted</h4>';
                 }
             }
         }
         //are there any orders with the same Member.email in the last seven days...
-        $otherOrders = Order::get()->filter(
-            array('MemberID' => $member->ID) + $timeFilter
-        )->exclude(array('ID' => $order->ID));
+        $otherOrders = Order::get_datalist_of_orders_with_submit_record()
+            ->filter(
+                array_merge(
+                    array('MemberID' => $member->ID),
+                    $timeFilter
+                )
+            )
+            ->innerJoin('')
+            ->exclude(array('ID' => $order->ID));
         foreach ($otherOrders as $otherOrder) {
             if (!isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = array();
@@ -411,17 +421,17 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
 
         if (count($this->warningMessages)) {
-            $html .= '<h2 style="color: red;">Blacklisted Details</h2><ul class="SecurityCheckListOfRisks warnings" style="color: red;">';
+            $html .= '<h4 style="color: red;">Blacklisted Details</h4><ul class="SecurityCheckListOfRisks warnings" style="color: red;">';
             foreach ($this->warningMessages as $warningMessage) {
                 $html .= $warningMessage;
             }
             $html .= '</ul>';
         } else {
-            $html .= '<h2>No Blacklisted Data Present</h2>';
+            $html .= '<h4>No Blacklisted Data Present</h4>';
         }
         if (count($similarArray)) {
             $days = $this->Config()->get('days_ago_to_check');
-            $html .= '<h2>Similar orders in the last '.$days.' days</h2><ul class="SecurityCheckListOfRisks otherRisks">';
+            $html .= '<h4>Similar orders in the last '.$days.' days</h4><ul class="SecurityCheckListOfRisks otherRisks">';
             foreach ($similarArray as $orderID => $fields) {
                 //we just loop this so we can get the order ...
                 foreach ($fields as $tempOrder) {
@@ -472,15 +482,14 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         return true;
     }
 
-
-    private static $_saved_already = false;
+    private static $_saved_already = 0;
 
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-        if (! self::$_saved_already) {
-            self::$_saved_already = true;
-            $order = $this->Order();
+        $order = $this->Order();
+        if (self::$_saved_already < 3) {
+            self::$_saved_already++;
             if ($order && $order->exists()) {
                 $this->SubTotal = $order->getSubTotal();
                 $this->Risks = $this->collateRisks();
@@ -490,20 +499,36 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $this->Risks = "Error";
                 $this->write();
             }
+            if($this->memberIsWhitelisted()) {
+                for ($i = 1; $i < 13; $i++) {
+                    $field = "Check".$i;
+                    $this->$field = 'Whitelisted Customer';
+                }
+                $this->write();
+            }
         }
         if($this->Bad) {
             foreach($this->BlacklistItems() as $blacklistItem) {
                 $blacklistItem->Status = 'Bad';
                 $blacklistItem->write();
             }
+            if ($order && $order->exists()) {
+                $order->Archive(true);
+            }
         }
     }
 
+    /**
+     *
+     * @param  EcommerceSecurityBaseClass $obj
+     * @return bool                             return true if the status of the object is `Bad`
+     */
     protected function checkSecurityObject($obj)
     {
         if ($obj->Status == 'Bad') {
             return false;
         }
+        return true;
     }
 
     /**

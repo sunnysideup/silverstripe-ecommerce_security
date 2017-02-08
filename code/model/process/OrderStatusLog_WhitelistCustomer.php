@@ -83,13 +83,14 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
      */
     public static function member_is_whitelisted(Member $member)
     {
-        return OrderStatusLog_WhitelistCustomer::get()
-            ->filter(
-                array(
-                    'MemberID' => $member->ID,
-                    'Whitelist' => 1
-                )
-            )->count() ? true : false;
+        return $member->IsWhitelisted;
+        // return OrderStatusLog_WhitelistCustomer::get()
+        //     ->filter(
+        //         array(
+        //             'MemberID' => $member->ID,
+        //             'Whitelist' => 1
+        //         )
+        //     )->count() ? true : false;
     }
 
     public function onAfterWrite()
@@ -133,43 +134,27 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                         $this->Whitelist = true;
                         $this->BasedOnID = $previousOne->ID;
                     } else {
-
-                        //member is already whitelisted
-                        $previousOne = OrderStatusLog_WhitelistCustomer::get()
+                        //member has placed orders before
+                        $previousOrders = Order::get()
                             ->filter(
                                 array(
-                                    'MemberID' => $member->ID
+                                    'MemberID' => $member->ID,
+                                    'CancelledByID' => 0
                                 )
                             )
                             ->exclude(
-                                array('OrderID' => $order->ID)
-                            )->first();
-                        if ($previousOne) {
-                            $this->Whitelist = true;
-                            $this->BasedOnID = $previousOne->ID;
-                        } else {
-                            //member has placed orders before
-                            $previousOrders = Order::get()
-                                ->filter(
-                                    array(
-                                        'MemberID' => $member->ID,
-                                        'CancelledByID' => 0
-                                    )
+                                array(
+                                    'ID' => $order->ID
                                 )
-                                ->exclude(
-                                    array(
-                                        'ID' => $order->ID
-                                    )
-                                );
-                            $count = 0;
-                            $minOrdersRequired = $this->Config()->get('min_number_of_paid_orders_required');
-                            foreach($previousOrders as $previousOrder) {
-                                if($previousOrder->IsPaid()) {
-                                    $count++;
-                                    if($count >= $minOrdersRequired) {
-                                        $this->Whitelist = true;
-                                        break;
-                                    }
+                            );
+                        $count = 0;
+                        $minOrdersRequired = $this->Config()->get('min_number_of_paid_orders_required');
+                        foreach($previousOrders as $previousOrder) {
+                            if($previousOrder->IsPaid() && $previousOrder->IsArchived()) {
+                                $count++;
+                                if($count >= $minOrdersRequired) {
+                                    $this->Whitelist = true;
+                                    break;
                                 }
                             }
                         }
