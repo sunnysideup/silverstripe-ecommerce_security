@@ -66,7 +66,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     );
 
     private static $field_labels = array(
-        'Bad' => 'Fraudulent'
+        'Bad' => 'Fraudulent',
+        'Title' => 'Value'
     );
 
     private static $singular_name = 'Security Check';
@@ -265,7 +266,6 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     $timeFilter
                 )
             )
-            ->innerJoin('')
             ->exclude(array('ID' => $order->ID));
         foreach ($otherOrders as $otherOrder) {
             if (!isset($similarArray[$otherOrder->ID])) {
