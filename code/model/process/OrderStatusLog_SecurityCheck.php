@@ -111,6 +111,13 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 'Bad'
             );
             $fields->addFieldToTab(
+                'Root.MoreDetails',
+                HTMLEditorField::create(
+                    'Note',
+                    'Notes'
+                )
+            );
+            $fields->addFieldToTab(
                 'Root.Main',
                 HeaderField::create(
                     'BadHeading',
@@ -252,7 +259,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             if ($member->Email) {
                 $emailArray[] = $member->Email;
                 if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
-                    $html .= '<h4 style="background-color: green; color: white; font-size: 20px; padding: 5px;">This customer is whitelisted</h4>';
+                    $html .= '<p class="warning good">This customer is whitelisted</p>';
                 } else {
                     $html .= '<p class="message warning">This customer is NOT whitelisted</p>';
                 }
@@ -441,7 +448,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
             $html .= '</ul>';
         } else {
-            $html .= '<p class="message good">There were no similar orders in the last '.$daysAgo.' days</p>';
+            $html .= '<p class="message good">No similar orders in the last '.$daysAgo.' days</p>';
         }
 
         return $html;
