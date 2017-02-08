@@ -427,7 +427,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
             $html .= '</ul>';
         } else {
-            $html .= '<h4>No Blacklisted Data Present</h4>';
+            $html .= '<p class="message good">No Blacklisted Data Present</p>';
         }
         if (count($similarArray)) {
             $days = $this->Config()->get('days_ago_to_check');
