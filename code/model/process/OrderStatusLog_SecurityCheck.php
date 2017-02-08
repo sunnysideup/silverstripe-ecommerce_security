@@ -253,7 +253,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
                     $html .= '<h4 style="background-color: green; color: white; font-size: 20px; padding: 5px;">This customer is whitelisted</h4>';
                 } else {
-                    $html .= '<h4>This customer is NOT whitelisted</h4>';
+                    $html .= '<p class="message warning">This customer is NOT whitelisted</p>';
                 }
             }
         }
