@@ -39,6 +39,8 @@ class EcommerceSecurityBaseClass extends DataObject
     );
 
     private static $summary_fields = array(
+        'Created' => 'Created',
+        'LastEdited.Ago' => 'Last Edit',
         'SimplerName' => 'Type',
         'Title' => 'Value',
         'Status' => 'Status'
@@ -48,6 +50,19 @@ class EcommerceSecurityBaseClass extends DataObject
         'ClassName_Title' => array('type' => 'unique', 'value' => '"ClassName","Title"'),
         'Title' => true,
         'ClassName' => true,
+    );
+
+    private static $field_labels = array(
+        'Title' => 'Value'
+    );
+
+    private static $searchable_fields = array(
+        'Title' => 'PartialMatchFilter',
+        'ClassName' => array(
+            'filter' => 'PartialMatchFilter',
+            'title' => 'Type'
+        ),
+        'Status' => 'PartialMatchFilter'
     );
 
     private static $default_sort = 'Status DESC';
@@ -79,7 +94,7 @@ class EcommerceSecurityBaseClass extends DataObject
                 }
             }
         }
-        
+
         return $obj;
     }
 
