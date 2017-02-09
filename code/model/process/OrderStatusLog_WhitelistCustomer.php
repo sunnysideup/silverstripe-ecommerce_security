@@ -79,18 +79,25 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
      *
      *
      * @param  Member  $member  the member to check
+     * @return boolean          returns true of the member is a security risk
+     */
+    public static function member_is_security_risk(Member $member)
+    {
+        return $member->IsSecurityRisk;
+    }
+
+    /**
+     *
+     *
+     * @param  Member  $member  the member to check
      * @return boolean          returns true of the member has been whitelisted before
      */
     public static function member_is_whitelisted(Member $member)
     {
+        if($member->IsSecurityRisk) {
+            return false;
+        }
         return $member->IsWhitelisted;
-        // return OrderStatusLog_WhitelistCustomer::get()
-        //     ->filter(
-        //         array(
-        //             'MemberID' => $member->ID,
-        //             'Whitelist' => 1
-        //         )
-        //     )->count() ? true : false;
     }
 
     public function onAfterWrite()
