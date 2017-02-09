@@ -39,6 +39,8 @@ class EcommerceSecurityBaseClass extends DataObject
     );
 
     private static $summary_fields = array(
+        'Created' => 'Created',
+        'LastEdited.Ago' => 'Last Edit',
         'SimplerName' => 'Type',
         'Title' => 'Value',
         'Status' => 'Status'
