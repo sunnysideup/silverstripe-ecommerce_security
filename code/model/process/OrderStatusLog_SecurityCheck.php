@@ -100,7 +100,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     {
         $order = $this->Order();
         if ($order) {
-            $member = $order->Member();
+            $member = $this->orderMember();
             $fields = parent::getCMSFields();
             $fields->addFieldToTab(
                 'Root.Main',
@@ -243,7 +243,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $order = $this->Order();
         $billingAddress = $order->BillingAddress();
         $shippingAddress = $order->ShippingAddress();
-        $member = $order->Member();
+        $member = $this->orderMember();
         $payments = $order->Payments();
         $html = '';
 
@@ -258,10 +258,14 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if ($member) {
             if ($member->Email) {
                 $emailArray[] = $member->Email;
-                if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
-                    $html .= '<p class="warning good">This customer is whitelisted</p>';
+                if(OrderStatusLog_WhitelistCustomer::member_is_security_risk($member)) {
+                    $html .= '<p class="message bad">This customer has been marked as a security risk.</p>';
                 } else {
-                    $html .= '<p class="message warning">This customer is NOT whitelisted</p>';
+                    if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
+                        $html .= '<p class="warning good">This customer is whitelisted.</p>';
+                    } else {
+                        $html .= '<p class="message warning">This customer is NOT whitelisted.</p>';
+                    }
                 }
             }
         }
@@ -522,6 +526,11 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             if ($order && $order->exists()) {
                 $order->Archive(true);
             }
+            if($member = $member->orderMember()) {
+                $member->IsWhitelisted = false;
+                $member->IsSecurityRisk = true;
+                $member->write();
+            }
         }
     }
 
@@ -548,15 +557,26 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     protected function memberIsWhitelisted()
     {
         if ($this->_memberIsWhitelisted  === null) {
-            $order = $this->Order();
-            if ($order && $order->exists()) {
-                $member = $order->Member();
-                if ($member && $member->exists()) {
-                    $this->_memberIsWhitelisted = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
-                }
+            if($member = $member->orderMember()) {
+                $this->_memberIsWhitelisted = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
             }
         }
         return $this->_memberIsWhitelisted;
+    }
+
+    /**
+     *
+     * @return null | Member
+     */
+    protected function orderMember()
+    {
+        $order = $this->Order();
+        if ($order && $order->exists()) {
+            $member = $order->Member();
+            if ($member && $member->exists()) {
+                return $member;
+            }
+        }
     }
 
     protected function blacklistCheck($arrayOfValues, $securityClass)
@@ -569,7 +589,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     $this->BlacklistItems()->add($obj);
                     if ($obj->hasRisks()) {
                         $title = $obj->i18n_singular_name();
-                        $this->warningMessages[] = '<li><strong>'.$title.':</strong> '.$value.'<li>';
+                        $message = '<li><strong>'.$title.':</strong> '.$value.'<li>';
+                        $this->warningMessages[$message] = $message;
                     }
                 }
             }
