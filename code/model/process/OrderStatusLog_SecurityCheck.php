@@ -89,7 +89,17 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
     public function canEdit($member = null)
     {
-        return parent::canEdit($member);
+        $order = $this->Order();
+        if ($order && $order->exists()) {
+            $status = $order->MyStep();
+            if($status && $status->Code == 'SECURITY_CHECK') {
+                return parent::canEdit($member);
+            } else {
+                return false;
+            }
+        } else {
+            return parent::canEdit($member);
+        }
     }
 
     /**
