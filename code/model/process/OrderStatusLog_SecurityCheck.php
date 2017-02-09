@@ -29,6 +29,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         'Check12' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
     );
 
+    private static $field_labels = array(
+        'Bad' => 'Mark as Fraudulent Order'
+    );
+
     private static $many_many = array(
         'BlacklistItems' => 'EcommerceSecurityBaseClass'
     );
@@ -247,9 +251,9 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             if ($member->Email) {
                 $emailArray[] = $member->Email;
                 if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
-                    $html .= '<h2 style="background-color: green; color: white; font-size: 20px; padding: 5px;">This customer is whitelisted</h2>';
+                    $html .= '<h4 style="background-color: green; color: white; font-size: 20px; padding: 5px;">This customer is whitelisted</h4>';
                 } else {
-                    $html .= '<h2>This customer is NOT whitelisted</h2>';
+                    $html .= '<h4>This customer is NOT whitelisted</h4>';
                 }
             }
         }
@@ -411,17 +415,21 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
 
         if (count($this->warningMessages)) {
-            $html .= '<h2 style="color: red;">Blacklisted Details</h2><ul class="SecurityCheckListOfRisks warnings" style="color: red;">';
+            $html .= '
+            <h4 style="color: red;">Blacklisted Details</h4>
+            <ul class="SecurityCheckListOfRisks warnings" style="color: red;">';
             foreach ($this->warningMessages as $warningMessage) {
                 $html .= $warningMessage;
             }
             $html .= '</ul>';
         } else {
-            $html .= '<h2>No Blacklisted Data Present</h2>';
+            $html .= '<h4>No Blacklisted Data Found</h4>';
         }
         if (count($similarArray)) {
             $days = $this->Config()->get('days_ago_to_check');
-            $html .= '<h2>Similar orders in the last '.$days.' days</h2><ul class="SecurityCheckListOfRisks otherRisks">';
+            $html .= '
+            <h4>Similar orders in the last '.$days.' days</h4>
+            <ul class="SecurityCheckListOfRisks otherRisks">';
             foreach ($similarArray as $orderID => $fields) {
                 //we just loop this so we can get the order ...
                 foreach ($fields as $tempOrder) {
