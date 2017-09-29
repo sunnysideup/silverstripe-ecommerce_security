@@ -112,6 +112,27 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if ($order) {
             $member = $this->orderMember();
             $fields = parent::getCMSFields();
+            $securityIP = EcommerceSecurityBaseClass::get()->filter(['ClassName' => 'EcommerceSecurityIP'])
+                            ->innerJoin('OrderStatusLog_SecurityCheck_BlacklistItems', '"EcommerceSecurityBaseClassID" = "EcommerceSecurityBaseClass"."ID"')->first();
+            if($securityIP){
+                $fields->addFieldToTab(
+                    'Root.Main',
+                    HeaderField::create(
+                        'BadHeading',
+                        'View IP Address Info: '
+                    ),
+                    'Bad'
+                );
+                $fields->addFieldToTab(
+                    'Root.Main',
+                    LiteralField::create(
+                        'IPAddressLink',
+                        '<a href="https://freegeoip.net/?q='.$securityIP->Title.'" target="_blank">https://freegeoip.net/?q='.$securityIP->Title.'</a>'
+                    ),
+                    'Bad'
+                );
+            }
+
             $fields->addFieldToTab(
                 'Root.Main',
                 HeaderField::create(
@@ -120,6 +141,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 ),
                 'Bad'
             );
+
+
             $fields->addFieldToTab(
                 'Root.MoreDetails',
                 HTMLEditorField::create(
@@ -137,6 +160,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             );
             $riskField = $fields->dataFieldByName('Risks');
             $riskField->setTitle('');
+
             if ($member) {
                 $previousOrders = Order::get()
                     ->filter(
