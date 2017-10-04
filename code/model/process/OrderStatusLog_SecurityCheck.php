@@ -120,19 +120,26 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 }
             }
             if($securityIP){
+                $country = '';
+                if(class_exists('GeoIP')){
+                    $country = GeoIP::ip2country($securityIP)['name'];
+                }
                 $fields->addFieldToTab(
                     'Root.Main',
                     HeaderField::create(
                         'BadHeading',
-                        'View IP Address Info: '
+                        'IP Address Info: '
                     ),
                     'Bad'
                 );
+                if($country){
+                    $country = '<em>Country:</em> '. $country . '</br>';
+                }
                 $fields->addFieldToTab(
                     'Root.Main',
                     LiteralField::create(
                         'IPAddressLink',
-                        '<a href="https://freegeoip.net/?q='.$securityIP.'" target="_blank">https://freegeoip.net/?q='.$securityIP.'</a>'
+                        $country . '<em>Detailed Info: </em><a href="https://freegeoip.net/?q='.$securityIP.'" target="_blank">https://freegeoip.net/?q='.$securityIP.'</a>'
                     ),
                     'Bad'
                 );
