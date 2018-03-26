@@ -274,30 +274,32 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 'Note'
             );
         }
-
-        $implementers = ClassInfo::implementorsOf('EcommerceSecurityLogInterface');
-        if($implementers){
-            foreach($implementers as $implementer){
-                $class = Injector::inst()->get($implementer);
-                $fields->addFieldsToTab(
-                    "Root.Main",
-                    [
-                        $class->getSecurityHeader(),
-                        $class->getSecuritySummary(),
-                    ]
-                );
-
-                if($class->getSecurityLogTable()){
+        if($order){
+            $implementers = ClassInfo::implementorsOf('EcommerceSecurityLogInterface');
+            if($implementers){
+                foreach($implementers as $implementer){
+                    $class = Injector::inst()->get($implementer);
                     $fields->addFieldsToTab(
-                        "Root.".$class->getSecurityLogTableTabName(),
+                        "Root.Main",
                         [
                             $class->getSecurityHeader(),
-                            $class->getSecurityLogTable()
+                            $class->getSecuritySummary($order),
                         ]
                     );
+
+                    if($class->getSecurityLogTable($order)){
+                        $fields->addFieldsToTab(
+                            "Root.".$class->getSecurityLogTableTabName(),
+                            [
+                                $class->getSecurityHeader(),
+                                $class->getSecurityLogTable($order)
+                            ]
+                        );
+                    }
                 }
             }
         }
+
         $fields->removeFieldFromTab('Root.Main', 'AuthorID');
         $fields->removeFieldFromTab('Root.Main', 'Title');
         $fields->removeFieldFromTab('Root.Main', 'InternalUseOnly');

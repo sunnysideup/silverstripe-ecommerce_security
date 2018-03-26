@@ -10,9 +10,12 @@ interface EcommerceSecurityLogInterface
     /**
      * if does not return NULL, then a tab will be created in ecom Sec. with the
      * actual OrderStatusLog entry or entries
+     *
+     * @param Order $order
+     *
      * @return FormField|null
      */
-    public function getSecurityLogTable();
+    public function getSecurityLogTable($order);
 
     /**
      * the name of the where the SecurityLogTable will be added if getSecurityLogTable returns a formField
@@ -22,9 +25,12 @@ interface EcommerceSecurityLogInterface
 
     /**
      * returns a summary without header for the Ecom Sec. Main summary Page
+     *
+     * @param Order $order
+     *
      * @return LiteralField (html)
      */
-    public function getSecuritySummary();
+    public function getSecuritySummary($order);
 
     /**
      * returns the header to be used in TAB and in Summary Page (on the Ecom Security Module)
