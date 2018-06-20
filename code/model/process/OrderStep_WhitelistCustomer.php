@@ -39,7 +39,6 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
      **/
     public function initStep(Order $order)
     {
-
         return true;
     }
 
@@ -68,7 +67,7 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
             return $this->_completed;
         }
         $entry = $this->RelevantLogEntry($order);
-        if ( ! $entry) {
+        if (! $entry) {
             $className = $this->relevantLogEntryClassName;
             $entry = $className::create();
             $entry->OrderID = $order->ID;

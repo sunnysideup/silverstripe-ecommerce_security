@@ -13,13 +13,12 @@ class EcommerceSecurityMemberDecoration extends DataExtension
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if($this->owner->IsSecurityRisk) {
+        if ($this->owner->IsSecurityRisk) {
             $this->owner->IsWhitelisted = false;
             $securityCheck = EcommerceSecurityEmail::get()->filter(['Title' => $this->owner->Email])->first();
-            if($securityCheck){
+            if ($securityCheck) {
                 $securityCheck->Status = 'Bad';
-            }
-            else {
+            } else {
                 $securityCheck = EcommerceSecurityEmail::create();
                 $securityCheck->Title = $this->owner->Email;
                 $securityCheck->Status = 'Bad';

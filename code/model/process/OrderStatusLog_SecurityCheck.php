@@ -92,7 +92,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $order = $this->Order();
         if ($order && $order->exists()) {
             $status = $order->MyStep();
-            if($status && $status->Code == 'SECURITY_CHECK') {
+            if ($status && $status->Code == 'SECURITY_CHECK') {
                 return parent::canEdit($member);
             } else {
                 return false;
@@ -113,15 +113,15 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             $member = $this->orderMember();
             $fields = parent::getCMSFields();
             $securityIP = "";
-            foreach($this->BlacklistItems() as $item){
-                if(is_a($item, 'EcommerceSecurityIP')){
+            foreach ($this->BlacklistItems() as $item) {
+                if (is_a($item, 'EcommerceSecurityIP')) {
                     $securityIP = $item->Title;
                     break;
                 }
             }
-            if($securityIP){
+            if ($securityIP) {
                 $country = '';
-                if(class_exists('GeoIP')){
+                if (class_exists('GeoIP')) {
                     $country = GeoIP::ip2country($securityIP)['name'];
                 }
                 $fields->addFieldToTab(
@@ -132,7 +132,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     ),
                     'Bad'
                 );
-                if($country){
+                if ($country) {
                     $country = '<em>Country:</em> '. $country . '</br>';
                 }
                 $fields->addFieldToTab(
@@ -274,10 +274,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 'Note'
             );
         }
-        if($order){
+        if ($order) {
             $implementers = ClassInfo::implementorsOf('EcommerceSecurityLogInterface');
-            if($implementers){
-                foreach($implementers as $implementer){
+            if ($implementers) {
+                foreach ($implementers as $implementer) {
                     $class = Injector::inst()->get($implementer);
                     $fields->addFieldsToTab(
                         "Root.Main",
@@ -287,7 +287,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                         ]
                     );
 
-                    if($class->getSecurityLogTable($order)){
+                    if ($class->getSecurityLogTable($order)) {
                         $fields->addFieldsToTab(
                             "Root.".$class->getSecurityLogTableTabName(),
                             [
@@ -330,7 +330,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if ($member) {
             if ($member->Email) {
                 $emailArray[] = $member->Email;
-                if(OrderStatusLog_WhitelistCustomer::member_is_security_risk($member)) {
+                if (OrderStatusLog_WhitelistCustomer::member_is_security_risk($member)) {
                     $html .= '<p class="message bad">This customer has been marked as a security risk.</p>';
                 } else {
                     if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
@@ -465,15 +465,15 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $ipProxyArray = array();
         if ($payments) {
             foreach ($payments as $payment) {
-                if(strlen($payment->IP) > 10) {
+                if (strlen($payment->IP) > 10) {
                     $ipArray[] = $payment->IP;
                 }
-                if(strlen($payment->ProxyIP) > 10) {
+                if (strlen($payment->ProxyIP) > 10) {
                     $ipProxyArray[] = $payment->ProxyIP;
                 }
             }
         }
-        if(count($ipArray)) {
+        if (count($ipArray)) {
             //are there any orders with the same IP in the xxx seven days...
             $otherPayments = EcommercePayment::get()->filter(
                 array('IP' => $ipArray) + $timeFilter
@@ -487,7 +487,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
             $this->blacklistCheck($ipArray, 'EcommerceSecurityIP');
         }
-        if(count($ipProxyArray)) {
+        if (count($ipProxyArray)) {
             //are there any orders with the same Proxy in the xxx seven days...
             $otherPayments = EcommercePayment::get()->filter(
                 array('ProxyIP' => $ipProxyArray) + $timeFilter
@@ -589,7 +589,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $this->Risks = "Error";
                 $this->write();
             }
-            if($this->memberIsWhitelisted()) {
+            if ($this->memberIsWhitelisted()) {
                 for ($i = 1; $i < 13; $i++) {
                     $field = "Check".$i;
                     $this->$field = 'Whitelisted Customer';
@@ -597,15 +597,15 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $this->write();
             }
         }
-        if($this->Bad) {
-            foreach($this->BlacklistItems() as $blacklistItem) {
+        if ($this->Bad) {
+            foreach ($this->BlacklistItems() as $blacklistItem) {
                 $blacklistItem->Status = 'Bad';
                 $blacklistItem->write();
             }
             if ($order && $order->exists()) {
                 $order->Archive(true);
             }
-            if($member = $this->orderMember()) {
+            if ($member = $this->orderMember()) {
                 $member->IsWhitelisted = false;
                 $member->IsSecurityRisk = true;
                 $member->write();
@@ -636,7 +636,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     protected function memberIsWhitelisted()
     {
         if ($this->_memberIsWhitelisted  === null) {
-            if($member = $this->orderMember()) {
+            if ($member = $this->orderMember()) {
                 $this->_memberIsWhitelisted = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
             }
         }
@@ -664,7 +664,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         foreach ($arrayOfValues as $value) {
             if ($value) {
                 $obj = $securityClass::find_or_create(array("Title" => $value));
-                if($obj->exists()) {
+                if ($obj->exists()) {
                     $this->BlacklistItems()->add($obj);
                     if ($obj->hasRisks()) {
                         $title = $obj->i18n_singular_name();
@@ -674,7 +674,5 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 }
             }
         }
-
     }
-
 }

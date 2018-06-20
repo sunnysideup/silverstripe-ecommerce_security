@@ -54,7 +54,8 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         return false;
     }
 
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $fields = parent::getCMSFields();
         $fields->replaceField(
             'BasedOnID',
@@ -94,7 +95,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
      */
     public static function member_is_whitelisted(Member $member)
     {
-        if($member->IsSecurityRisk) {
+        if ($member->IsSecurityRisk) {
             return false;
         }
         return $member->IsWhitelisted;
@@ -116,7 +117,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
     public function assessCustomer()
     {
         //already done ...
-        if($this->Whitelist) {
+        if ($this->Whitelist) {
             return true;
         }
         $order = $this->Order();
@@ -156,10 +157,10 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                             );
                         $count = 0;
                         $minOrdersRequired = $this->Config()->get('min_number_of_paid_orders_required');
-                        foreach($previousOrders as $previousOrder) {
-                            if($previousOrder->IsPaid() && $previousOrder->IsArchived()) {
+                        foreach ($previousOrders as $previousOrder) {
+                            if ($previousOrder->IsPaid() && $previousOrder->IsArchived()) {
                                 $count++;
-                                if($count >= $minOrdersRequired) {
+                                if ($count >= $minOrdersRequired) {
                                     $this->Whitelist = true;
                                     break;
                                 }
