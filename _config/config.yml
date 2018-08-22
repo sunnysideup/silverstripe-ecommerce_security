@@ -21,6 +21,9 @@ EcommerceRole:
   admin_role_permission_codes:
     - CMS_ACCESS_SecurityCheck_ModelAdmin
 
+Order:
+  extensions:
+    - EcommerceSecurityOrderDecoration
 
 OrderStatusLog:
   available_log_classes_array:
