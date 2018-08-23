@@ -3,28 +3,30 @@
 class EcommerceSecurityOrderDecoration extends DataExtension
 {
     private static $db = array(
-        'SkipPayment' => 'Boolean'
+        'SkipToSecurityChecks' => 'Boolean'
     );
 
     public function updateCMSFields(FieldList $fields)
     {
         if ($this->owner->IsSubmitted()) {
-            if (! $this->owner->IsPaid()) {
+            $currentStep = $this->owner->MyStep()->Sort;
+            $securityStep = OrderStep::get()->filter(['ClassName' => 'OrderStep_SecurityCheck'])->first()->Sort;
+            if (! $this->owner->IsPaid() && $currentStep < $securityStep) {
                 $fields->addFieldsToTab(
-                    'Root.Payments',
+                    'Root.Next',
                     [
                         HeaderField::create(
-                            'SkipToSecurityChecks',
+                            'SkipToSecurityChecksHeader',
                             'Skip To Security Checks'
                         ),
                         CheckboxField::create(
-                            'SkipPayment',
-                            'Skip Payment'
+                            'SkipToSecurityChecks',
+                            'Skip To Security Checks'
                         )->setDescription(
-                            'Ticking this checkbox will add a fake "successful" payment to the order,  this allows the order to proceed to the security checks step.
-                            <br>Make sure to save the order after ticking this checkbox.'
+                            'Ticking this checkbox will skip the payment step, allowing security checks to be conducted for orders that do not have successful payments.'
                         )
-                    ]
+                    ],
+                    'ActionNextStepManually'
                 );
             }
         }
@@ -36,15 +38,14 @@ class EcommerceSecurityOrderDecoration extends DataExtension
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if ($this->owner->SkipPayment) {
-            $money = Money::create();
-            $money->setAmount($this->owner->TotalOutstanding());
-            $payment = EcommercePayment::create();
-            $payment->Status = 'Success';
-            $payment->Amount = $money;
-            $payment->Message = 'This is a fake payment that has been created to allow the order to proceed to the next step, this order has not really been paid for.';
-            $payment->write();
-            $this->owner->Payments()->add($payment);
+        if ($this->owner->SkipToSecurityChecks) {
+            $securityCheck = OrderStatusLog_SecurityCheck::create();
+            $securityCheck->OrderID = $this->owner->ID;
+            $securityCheck->write();
+            $securityStepID = OrderStep::get()->filter(['ClassName' => 'OrderStep_SecurityCheck'])->first()->ID;
+            if($securityStepID){
+                $this->owner->StatusID = $securityStepID;
+            }
         }
     }
 }
