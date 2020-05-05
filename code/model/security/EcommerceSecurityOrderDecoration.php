@@ -39,12 +39,18 @@ class EcommerceSecurityOrderDecoration extends DataExtension
     {
         parent::onBeforeWrite();
         if ($this->owner->SkipToSecurityChecks) {
-            $securityCheck = OrderStatusLog_SecurityCheck::create();
-            $securityCheck->OrderID = $this->owner->ID;
-            $securityCheck->write();
-            $securityStepID = OrderStep::get()->filter(['ClassName' => 'OrderStep_SecurityCheck'])->first()->ID;
-            if($securityStepID){
-                $this->owner->StatusID = $securityStepID;
+            $logCount = OrderStatusLog_SecurityCheck::get()->filter(['OrderID' => $this->owner->ID])->count();
+            if ($logCount) {
+                //do nothing - the security check already exists
+            } 
+            else {
+                $securityCheck = OrderStatusLog_SecurityCheck::create();
+                $securityCheck->OrderID = $this->owner->ID;
+                $securityCheck->write();
+                $securityStepID = OrderStep::get()->filter(['ClassName' => 'OrderStep_SecurityCheck'])->first()->ID;
+                if($securityStepID){
+                    $this->owner->StatusID = $securityStepID;
+                }
             }
         }
     }
