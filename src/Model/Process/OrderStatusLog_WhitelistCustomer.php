@@ -2,10 +2,16 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
-use OrderStatusLog;
-use CMSEditLinkField;
-use Member;
-use Order;
+
+
+
+
+use SilverStripe\Security\Member;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_WhitelistCustomer;
+use Sunnysideup\CmsEditLinkField\Forms\Fields\CMSEditLinkField;
+use Sunnysideup\Ecommerce\Model\Order;
+use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
+
 
 
 
@@ -41,8 +47,8 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
     );
 
     private static $has_one = array(
-        'Member' => 'Member',
-        'BasedOn' => 'OrderStatusLog_WhitelistCustomer'
+        'Member' => Member::class,
+        'BasedOn' => OrderStatusLog_WhitelistCustomer::class
     );
 
     private static $defaults = array(

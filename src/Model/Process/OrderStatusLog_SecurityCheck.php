@@ -2,20 +2,43 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
-use OrderStatusLog;
+
 use GeoIP;
-use HeaderField;
-use LiteralField;
-use HTMLEditorField;
-use Order;
-use GridField;
-use OptionsetField;
-use ClassInfo;
-use Injector;
-use BillingAddress;
-use ShippingAddress;
-use EcommercePayment;
-use DBField;
+
+
+
+
+
+
+
+
+
+
+
+
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityIP;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+use Sunnysideup\Ecommerce\Model\Order;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\OptionsetField;
+use Sunnysideup\EcommerceSecurity\Interfaces\EcommerceSecurityLogInterface;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Control\Email\Email;
+use Sunnysideup\Ecommerce\Model\Address\BillingAddress;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
+use Sunnysideup\Ecommerce\Model\Address\ShippingAddress;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityPhone;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityAddress;
+use Sunnysideup\Ecommerce\Model\Money\EcommercePayment;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityProxyIP;
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBField;
+use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
+
 
 
 
@@ -48,7 +71,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     );
 
     private static $many_many = array(
-        'BlacklistItems' => 'EcommerceSecurityBaseClass'
+        'BlacklistItems' => EcommerceSecurityBaseClass::class
     );
 
     /**
@@ -132,7 +155,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             $fields = parent::getCMSFields();
             $securityIP = "";
             foreach ($this->BlacklistItems() as $item) {
-                if (is_a($item, 'EcommerceSecurityIP')) {
+                if (is_a($item, EcommerceSecurityIP::class)) {
                     $securityIP = $item->Title;
                     break;
                 }
@@ -293,7 +316,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             );
         }
         if ($order) {
-            $implementers = ClassInfo::implementorsOf('EcommerceSecurityLogInterface');
+            $implementers = ClassInfo::implementorsOf(EcommerceSecurityLogInterface::class);
             if ($implementers) {
                 foreach ($implementers as $implementer) {
                     $class = Injector::inst()->get($implementer);
@@ -372,7 +395,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             if (!isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = [];
             }
-            $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
+            $similarArray[$otherOrder->ID][Email::class] = $otherOrder;
         }
         //check emails from billing address
         $emailArray = [];
@@ -390,10 +413,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             if (!isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = [];
             }
-            $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
+            $similarArray[$otherOrder->ID][Email::class] = $otherOrder;
         }
         //adding all emails to security checks
-        $this->blacklistCheck($emailArray, 'EcommerceSecurityEmail');
+        $this->blacklistCheck($emailArray, EcommerceSecurityEmail::class);
 
 
         //phones
@@ -434,7 +457,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             }
         }
         //adding all emails to security checks
-        $this->blacklistCheck($phoneArray, 'EcommerceSecurityPhone');
+        $this->blacklistCheck($phoneArray, EcommerceSecurityPhone::class);
 
         //addresses
         $addressArray = [];
@@ -475,7 +498,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
             }
         }
-        $this->blacklistCheck($addressArray, 'EcommerceSecurityAddress');
+        $this->blacklistCheck($addressArray, EcommerceSecurityAddress::class);
 
 
         //IP
@@ -503,7 +526,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 }
                 $similarArray[$otherOrder->ID]["IP"] = $otherOrder;
             }
-            $this->blacklistCheck($ipArray, 'EcommerceSecurityIP');
+            $this->blacklistCheck($ipArray, EcommerceSecurityIP::class);
         }
         if (count($ipProxyArray)) {
             //are there any orders with the same Proxy in the xxx seven days...
@@ -517,7 +540,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 }
                 $similarArray[$otherOrder->ID]["ProxyIP"] = $otherOrder;
             }
-            $this->blacklistCheck($ipProxyArray, 'EcommerceSecurityProxyIP');
+            $this->blacklistCheck($ipProxyArray, EcommerceSecurityProxyIP::class);
         }
 
 
@@ -557,7 +580,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
     public function getSecurityCleared()
     {
-        return  DBField::create_field('Boolean', ($this->pass() ? true : false));
+        return  DBField::create_field(DBBoolean::class, ($this->pass() ? true : false));
     }
 
     /**

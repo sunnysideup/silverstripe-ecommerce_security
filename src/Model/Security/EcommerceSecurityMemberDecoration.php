@@ -2,8 +2,11 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Security;
 
-use DataExtension;
-use EcommerceSecurityEmail;
+
+
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
+use SilverStripe\ORM\DataExtension;
+
 
 
 

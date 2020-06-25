@@ -1,6 +1,8 @@
 <?php
 
 namespace Sunnysideup\EcommerceSecurity\Model\Records;
+use SilverStripe\Control\Email\Email;
+
 
 
 
@@ -22,7 +24,7 @@ class EcommerceSecurityEmail extends EcommerceSecurityBaseClass
     private static $plural_name = "Blacklisted Emails";
 
     private static $field_labels = array(
-        'Title' => 'Email'
+        'Title' => Email::class
     );
 }
 

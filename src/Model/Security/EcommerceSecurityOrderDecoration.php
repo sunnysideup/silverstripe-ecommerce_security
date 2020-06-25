@@ -2,12 +2,20 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Security;
 
-use DataExtension;
-use FieldList;
-use OrderStep;
-use HeaderField;
-use CheckboxField;
-use OrderStatusLog_SecurityCheck;
+
+
+
+
+
+
+use SilverStripe\Forms\FieldList;
+use Sunnysideup\Ecommerce\Model\Process\OrderStep;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStep_SecurityCheck;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\CheckboxField;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck;
+use SilverStripe\ORM\DataExtension;
+
 
 
 
@@ -43,7 +51,7 @@ class EcommerceSecurityOrderDecoration extends DataExtension
     {
         if ($this->owner->IsSubmitted()) {
             $currentStep = $this->owner->MyStep()->Sort;
-            $securityStep = OrderStep::get()->filter(['ClassName' => 'OrderStep_SecurityCheck'])->first()->Sort;
+            $securityStep = OrderStep::get()->filter(['ClassName' => OrderStep_SecurityCheck::class])->first()->Sort;
             if (! $this->owner->IsPaid() && $currentStep < $securityStep) {
                 $fields->addFieldsToTab(
                     'Root.Next',
@@ -80,7 +88,7 @@ class EcommerceSecurityOrderDecoration extends DataExtension
                 $securityCheck = OrderStatusLog_SecurityCheck::create();
                 $securityCheck->OrderID = $this->owner->ID;
                 $securityCheck->write();
-                $securityStepID = OrderStep::get()->filter(['ClassName' => 'OrderStep_SecurityCheck'])->first()->ID;
+                $securityStepID = OrderStep::get()->filter(['ClassName' => OrderStep_SecurityCheck::class])->first()->ID;
                 if($securityStepID){
                     $this->owner->StatusID = $securityStepID;
                 }

@@ -2,7 +2,9 @@
 
 namespace Sunnysideup\EcommerceSecurity\Cms;
 
-use ModelAdminEcommerceBaseClass;
+
+use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
+
 
 
 

@@ -2,13 +2,24 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Records;
 
-use DataObject;
-use Config;
-use Member;
-use Permission;
-use ReadonlyField;
-use ClassInfo;
-use EcommerceClassNameOrTypeDropdownField;
+
+
+
+
+
+
+
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck;
+use SilverStripe\Security\Member;
+use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
+use SilverStripe\Security\Permission;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Core\ClassInfo;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass;
+use Sunnysideup\Ecommerce\Forms\Fields\EcommerceClassNameOrTypeDropdownField;
+use SilverStripe\ORM\DataObject;
+
 
 
 
@@ -73,7 +84,7 @@ class EcommerceSecurityBaseClass extends DataObject
     );
 
     private static $belongs_many_many = array(
-        'SecurityChecks' => 'OrderStatusLog_SecurityCheck'
+        'SecurityChecks' => OrderStatusLog_SecurityCheck::class
     );
 
     private static $casting = array(
@@ -191,7 +202,7 @@ class EcommerceSecurityBaseClass extends DataObject
         if ($extended !== null) {
             return $extended;
         }
-        if (Permission::checkMember($member, Config::inst()->get('EcommerceRole', 'admin_permission_code'))) {
+        if (Permission::checkMember($member, Config::inst()->get(EcommerceRole::class, 'admin_permission_code'))) {
             return true;
         }
 
@@ -207,7 +218,7 @@ class EcommerceSecurityBaseClass extends DataObject
         if ($extended !== null) {
             return $extended;
         }
-        if (Permission::checkMember($member, Config::inst()->get('EcommerceRole', 'admin_permission_code'))) {
+        if (Permission::checkMember($member, Config::inst()->get(EcommerceRole::class, 'admin_permission_code'))) {
             return true;
         }
 
@@ -263,7 +274,7 @@ class EcommerceSecurityBaseClass extends DataObject
                 EcommerceClassNameOrTypeDropdownField::create(
                     'ClassName',
                     'Type',
-                    'EcommerceSecurityBaseClass',
+                    EcommerceSecurityBaseClass::class,
                     $availableClasses
                 )->addExtraClass('dropdown')
             );

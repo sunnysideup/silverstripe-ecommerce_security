@@ -2,9 +2,14 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
-use OrderStep;
-use OrderStepInterface;
-use Order;
+
+
+
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_WhitelistCustomer;
+use Sunnysideup\Ecommerce\Model\Order;
+use Sunnysideup\Ecommerce\Model\Process\OrderStep;
+use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
+
 
 
 class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterface
@@ -24,7 +29,7 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
      *
      * @var string
      */
-    protected $relevantLogEntryClassName = 'OrderStatusLog_WhitelistCustomer';
+    protected $relevantLogEntryClassName = OrderStatusLog_WhitelistCustomer::class;
 
     public function getCMSFields()
     {
