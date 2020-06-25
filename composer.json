@@ -1,6 +1,6 @@
 {
     "name": "sunnysideup/ecommerce_security",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "description": "Add additional security checks to your Silverstripe e-commerce install.",
     "keywords": [
         "Silverstripe-CMS",
