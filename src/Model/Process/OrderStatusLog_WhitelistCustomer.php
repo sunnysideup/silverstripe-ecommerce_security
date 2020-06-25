@@ -2,18 +2,10 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
-
-
-
-
 use SilverStripe\Security\Member;
-use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_WhitelistCustomer;
 use Sunnysideup\CmsEditLinkField\Forms\Fields\CMSEditLinkField;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
-
-
-
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
@@ -28,40 +20,38 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
      */
     private static $min_number_of_paid_orders_required = 1;
 
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * OLD: private static $db (case sensitive)
-  * NEW: 
-    private static $table_name = '[SEARCH_REPLACE_CLASS_NAME_GOES_HERE]';
-
+    /**
+     * ### @@@@ START REPLACEMENT @@@@ ###
+     * OLD: private static $db (case sensitive)
+     * NEW:
     private static $db (COMPLEX)
-  * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-    
+     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
+     * ### @@@@ STOP REPLACEMENT @@@@ ###
+     */
     private static $table_name = 'OrderStatusLog_WhitelistCustomer';
 
-    private static $db = array(
-        'Whitelist' => 'Boolean'
-    );
+    private static $db = [
+        'Whitelist' => 'Boolean',
+    ];
 
-    private static $has_one = array(
+    private static $has_one = [
         'Member' => Member::class,
-        'BasedOn' => OrderStatusLog_WhitelistCustomer::class
-    );
+        'BasedOn' => OrderStatusLog_WhitelistCustomer::class,
+    ];
 
-    private static $defaults = array(
-        'InternalUseOnly' => true
-    );
+    private static $defaults = [
+        'InternalUseOnly' => true,
+    ];
 
     private static $singular_name = 'Whitelist Customer Record';
+
+    private static $plural_name = 'Whitelist Customer Records';
+
     public function i18n_singular_name()
     {
         return self::$singular_name;
     }
 
-    private static $plural_name = 'Whitelist Customer Records';
     public function i18n_plural_name()
     {
         return self::$plural_name;
@@ -87,15 +77,14 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         $fields = parent::getCMSFields();
         $fields->replaceField(
             'BasedOnID',
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: LinkField (case sensitive)
-  * NEW: LinkField (COMPLEX)
-  * EXP: You may need to run the following class: https://github.com/sunnysideup/silverstripe-migration-task/blob/master/src/Tasks/FixSheaDawsonLink.php
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
+            /**
+             * ### @@@@ START REPLACEMENT @@@@ ###
+             * WHY: automated upgrade
+             * OLD: LinkField (case sensitive)
+             * NEW: LinkField (COMPLEX)
+             * EXP: You may need to run the following class: https://github.com/sunnysideup/silverstripe-migration-task/blob/master/src/Tasks/FixSheaDawsonLink.php
+             * ### @@@@ STOP REPLACEMENT @@@@ ###
+             */
             CMSEditLinkField::create(
                 'BasedOnID',
                 _t('OrderStatusLog_WhitelistCustomer.BASED_ON', 'Based on'),
@@ -104,15 +93,14 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         );
         $fields->replaceField(
             'MemberID',
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: LinkField (case sensitive)
-  * NEW: LinkField (COMPLEX)
-  * EXP: You may need to run the following class: https://github.com/sunnysideup/silverstripe-migration-task/blob/master/src/Tasks/FixSheaDawsonLink.php
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
+            /**
+             * ### @@@@ START REPLACEMENT @@@@ ###
+             * WHY: automated upgrade
+             * OLD: LinkField (case sensitive)
+             * NEW: LinkField (COMPLEX)
+             * EXP: You may need to run the following class: https://github.com/sunnysideup/silverstripe-migration-task/blob/master/src/Tasks/FixSheaDawsonLink.php
+             * ### @@@@ STOP REPLACEMENT @@@@ ###
+             */
             CMSEditLinkField::create(
                 'MemberID',
                 _t('OrderStatusLog_WhitelistCustomer.CUSTOMER', 'Customer'),
@@ -123,8 +111,6 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
     }
 
     /**
-     *
-     *
      * @param  Member  $member  the member to check
      * @return boolean          returns true of the member is a security risk
      */
@@ -134,8 +120,6 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
     }
 
     /**
-     *
-     *
      * @param  Member  $member  the member to check
      * @return boolean          returns true of the member has been whitelisted before
      */
@@ -176,13 +160,13 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                     //check if member has previouly been whitelisted
                     $previousOne = OrderStatusLog_WhitelistCustomer::get()
                         ->filter(
-                            array(
+                            [
                                 'Whitelist' => 1,
-                                'MemberID' => $member->ID
-                            )
+                                'MemberID' => $member->ID,
+                            ]
                         )
                         ->exclude(
-                            array('OrderID' => $order->ID)
+                            ['OrderID' => $order->ID]
                         )->first();
                     if ($previousOne) {
                         $this->Whitelist = true;
@@ -191,15 +175,15 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                         //member has placed orders before
                         $previousOrders = Order::get()
                             ->filter(
-                                array(
+                                [
                                     'MemberID' => $member->ID,
-                                    'CancelledByID' => 0
-                                )
+                                    'CancelledByID' => 0,
+                                ]
                             )
                             ->exclude(
-                                array(
-                                    'ID' => $order->ID
-                                )
+                                [
+                                    'ID' => $order->ID,
+                                ]
                             );
                         $count = 0;
                         $minOrdersRequired = $this->Config()->get('min_number_of_paid_orders_required');
@@ -219,4 +203,3 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         }
     }
 }
-

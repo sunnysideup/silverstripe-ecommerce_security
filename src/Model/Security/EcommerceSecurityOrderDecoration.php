@@ -2,50 +2,37 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Security;
 
-
-
-
-
-
-
-use SilverStripe\Forms\FieldList;
-use Sunnysideup\Ecommerce\Model\Process\OrderStep;
-use Sunnysideup\EcommerceSecurity\Model\Process\OrderStep_SecurityCheck;
-use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\CheckboxField;
-use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\HeaderField;
 use SilverStripe\ORM\DataExtension;
-
-
-
+use Sunnysideup\Ecommerce\Model\Process\OrderStep;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStep_SecurityCheck;
 
 /**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD:  extends DataExtension (ignore case)
-  * NEW:  extends DataExtension (COMPLEX)
-  * EXP: Check for use of $this->anyVar and replace with $this->anyVar[$this->owner->ID] or consider turning the class into a trait
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
+ * ### @@@@ START REPLACEMENT @@@@ ###
+ * WHY: automated upgrade
+ * OLD:  extends DataExtension (ignore case)
+ * NEW:  extends DataExtension (COMPLEX)
+ * EXP: Check for use of $this->anyVar and replace with $this->anyVar[$this->owner->ID] or consider turning the class into a trait
+ * ### @@@@ STOP REPLACEMENT @@@@ ###
+ */
 class EcommerceSecurityOrderDecoration extends DataExtension
 {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * OLD: private static $db (case sensitive)
-  * NEW: 
-    private static $table_name = '[SEARCH_REPLACE_CLASS_NAME_GOES_HERE]';
-
+    /**
+     * ### @@@@ START REPLACEMENT @@@@ ###
+     * OLD: private static $db (case sensitive)
+     * NEW:
     private static $db (COMPLEX)
-  * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-    
+     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
+     * ### @@@@ STOP REPLACEMENT @@@@ ###
+     */
     private static $table_name = 'EcommerceSecurityOrderDecoration';
 
-    private static $db = array(
-        'SkipToSecurityChecks' => 'Boolean'
-    );
+    private static $db = [
+        'SkipToSecurityChecks' => 'Boolean',
+    ];
 
     public function updateCMSFields(FieldList $fields)
     {
@@ -65,7 +52,7 @@ class EcommerceSecurityOrderDecoration extends DataExtension
                             'Skip To Security Checks'
                         )->setDescription(
                             'Ticking this checkbox will skip the payment step, allowing security checks to be conducted for orders that do not have successful payments.'
-                        )
+                        ),
                     ],
                     'ActionNextStepManually'
                 );
@@ -83,17 +70,15 @@ class EcommerceSecurityOrderDecoration extends DataExtension
             $logCount = OrderStatusLog_SecurityCheck::get()->filter(['OrderID' => $this->owner->ID])->count();
             if ($logCount) {
                 //do nothing - the security check already exists
-            } 
-            else {
+            } else {
                 $securityCheck = OrderStatusLog_SecurityCheck::create();
                 $securityCheck->OrderID = $this->owner->ID;
                 $securityCheck->write();
                 $securityStepID = OrderStep::get()->filter(['ClassName' => OrderStep_SecurityCheck::class])->first()->ID;
-                if($securityStepID){
+                if ($securityStepID) {
                     $this->owner->StatusID = $securityStepID;
                 }
             }
         }
     }
 }
-

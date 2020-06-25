@@ -2,11 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecurity\Cms;
 
-
 use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
-
-
-
 
 /**
  * @description: CMS management for everything you have sold and all related data (e.g. logs, payments)
@@ -18,6 +14,13 @@ use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
  **/
 class SecurityCheck_ModelAdmin extends ModelAdminEcommerceBaseClass
 {
+    /**
+     * Change this variable if you don't want the Import from CSV form to appear.
+     * This variable can be a boolean or an array.
+     * If array, you can list className you want the form to appear on. i.e. array('myClassOne','myClasstwo').
+     */
+    public $showImportForm = false;
+
     /**
      * standard SS variable.
      *
@@ -40,17 +43,9 @@ class SecurityCheck_ModelAdmin extends ModelAdminEcommerceBaseClass
     private static $menu_priority = 3.0;
 
     /**
-     * Change this variable if you don't want the Import from CSV form to appear.
-     * This variable can be a boolean or an array.
-     * If array, you can list className you want the form to appear on. i.e. array('myClassOne','myClasstwo').
-     */
-    public $showImportForm = false;
-
-    /**
      * standard SS variable.
      *
      * @var string
      */
     private static $menu_icon = 'ecommerce/images/icons/money-file.gif';
 }
-
