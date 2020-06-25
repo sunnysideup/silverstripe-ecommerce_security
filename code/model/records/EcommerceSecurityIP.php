@@ -21,3 +21,4 @@ class EcommerceSecurityIP extends EcommerceSecurityBaseClass
         'Title' => 'IP'
     );
 }
+

@@ -20,3 +20,4 @@ class EcommerceSecurityAddress extends EcommerceSecurityBaseClass
         'Title' => 'Address'
     );
 }
+

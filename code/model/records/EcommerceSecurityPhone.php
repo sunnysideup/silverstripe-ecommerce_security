@@ -20,3 +20,4 @@ class EcommerceSecurityPhone extends EcommerceSecurityBaseClass
         'Title' => 'Phone'
     );
 }
+

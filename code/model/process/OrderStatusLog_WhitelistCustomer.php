@@ -173,3 +173,4 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         }
     }
 }
+

@@ -149,3 +149,4 @@ class OrderStep_SecurityCheck extends OrderStep implements OrderStepInterface
         return 'Make sure that the Order is safe to proceed';
     }
 }
+

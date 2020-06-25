@@ -123,3 +123,4 @@ class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterfac
         return true;
     }
 }
+

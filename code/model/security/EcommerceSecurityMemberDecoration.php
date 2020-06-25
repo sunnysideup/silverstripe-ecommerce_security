@@ -27,3 +27,4 @@ class EcommerceSecurityMemberDecoration extends DataExtension
         }
     }
 }
+

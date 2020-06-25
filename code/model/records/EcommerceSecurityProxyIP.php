@@ -21,3 +21,4 @@ class EcommerceSecurityProxyIP extends EcommerceSecurityBaseClass
         'Title' => 'ProxyIP'
     );
 }
+

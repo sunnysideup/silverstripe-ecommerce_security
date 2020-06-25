@@ -20,3 +20,4 @@ class EcommerceSecurityEmail extends EcommerceSecurityBaseClass
         'Title' => 'Email'
     );
 }
+

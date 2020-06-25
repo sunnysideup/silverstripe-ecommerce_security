@@ -676,3 +676,4 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         }
     }
 }
+

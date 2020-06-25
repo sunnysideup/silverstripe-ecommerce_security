@@ -220,3 +220,4 @@ class EcommerceSecurityBaseClass extends DataObject
         parent::requireDefaultRecords();
     }
 }
+

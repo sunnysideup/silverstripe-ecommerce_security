@@ -46,3 +46,4 @@ class SecurityCheck_ModelAdmin extends ModelAdminEcommerceBaseClass
      */
     private static $menu_icon = 'ecommerce/images/icons/money-file.gif';
 }
+
