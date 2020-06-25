@@ -1,46 +1,38 @@
 ---
 Name: ecommerce_security
 Before:
-  - 'mysite/*'
+  - 'app/*'
 After:
   - 'framework/*'
   - 'cms/*'
   - 'ecommerce/*'
 ---
-
-Member:
+SilverStripe\Security\Member:
   extensions:
-    - EcommerceSecurityMemberDecoration
-
-SecurityCheck_ModelAdmin:
+    - Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityMemberDecoration
+Sunnysideup\EcommerceSecurity\Cms\SecurityCheck_ModelAdmin:
   managed_models:
-    - EcommerceSecurityBaseClass
-
-
-EcommerceRole:
+    - Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass
+Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole:
   admin_role_permission_codes:
     - CMS_ACCESS_SecurityCheck_ModelAdmin
-
-Order:
+Sunnysideup\Ecommerce\Model\Order:
   extensions:
-    - EcommerceSecurityOrderDecoration
-
-OrderStatusLog:
+    - Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityOrderDecoration
+Sunnysideup\Ecommerce\Model\Process\OrderStatusLog:
   available_log_classes_array:
-    - OrderStatusLog_SecurityCheck
-    - OrderStatusLog_WhitelistCustomer
-
-
+    - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck
+    - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_WhitelistCustomer
 ---
 After:
   - 'framework/*'
   - 'cms/*'
   - 'ecommerce/*'
-  - 'mysite/*'
+  - 'app/*'
 Only:
   moduleexists: 'grouped-cms-menu'
 ---
-LeftAndMain:
+SilverStripe\Admin\LeftAndMain:
   menu_groups:
     Shop:
-      - SecurityCheck_ModelAdmin
+      - Sunnysideup\EcommerceSecurity\Cms\SecurityCheck_ModelAdmin

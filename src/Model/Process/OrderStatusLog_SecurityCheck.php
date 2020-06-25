@@ -1,5 +1,42 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Process;
+
+use GeoIP;
+
+
+
+
+
+
+
+
+
+
+
+
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\OptionsetField;
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBField;
+use Sunnysideup\Ecommerce\Model\Address\BillingAddress;
+use Sunnysideup\Ecommerce\Model\Address\ShippingAddress;
+use Sunnysideup\Ecommerce\Model\Money\EcommercePayment;
+use Sunnysideup\Ecommerce\Model\Order;
+use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
+use Sunnysideup\EcommerceSecurity\Interfaces\EcommerceSecurityLogInterface;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityAddress;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityIP;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityPhone;
+use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityProxyIP;
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
@@ -9,9 +46,11 @@
  **/
 class OrderStatusLog_SecurityCheck extends OrderStatusLog
 {
+    protected $warningMessages = [];
+
     private static $days_ago_to_check = 14;
 
-    private static $db = array(
+    private static $db = [
         'Bad' => 'Boolean',
         'Risks' => 'HTMLText',
         'SubTotal' => 'Currency',
@@ -27,11 +66,11 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         'Check10' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
         'Check11' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
         'Check12' => 'Enum("To do, Done, Whitelisted Customer", "To do" )',
-    );
+    ];
 
-    private static $many_many = array(
-        'BlacklistItems' => 'EcommerceSecurityBaseClass'
-    );
+    private static $many_many = [
+        'BlacklistItems' => EcommerceSecurityBaseClass::class,
+    ];
 
     /**
      *  this array works as follows
@@ -49,57 +88,66 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
      *
      * @var array
      */
-    private static $checks_required = array();
+    private static $checks_required = [];
 
-    private static $summary_fields = array(
+    private static $summary_fields = [
         'Type' => 'Type',
         'SubTotal' => 'SubTotal',
-        'SecurityCleared' => 'Security Cleared'
-    );
+        'SecurityCleared' => 'Security Cleared',
+    ];
 
-    private static $casting = array(
-        'SecurityCleared' => 'Boolean'
-    );
+    private static $casting = [
+        'SecurityCleared' => 'Boolean',
+    ];
 
-    private static $defaults = array(
-        'InternalUseOnly' => true
-    );
+    private static $defaults = [
+        'InternalUseOnly' => true,
+    ];
 
-    private static $field_labels = array(
+    private static $field_labels = [
         'Bad' => 'Fraudulent',
-        'Title' => 'Value'
-    );
+        'Title' => 'Value',
+    ];
 
     private static $singular_name = 'Security Check';
+
+    private static $plural_name = 'Security Checks';
+
+    private static $_saved_already = 0;
+
+    /**
+     * caching variable only...
+     *
+     * @var bool|null
+     */
+    private $_memberIsWhitelisted = null;
+
     public function i18n_singular_name()
     {
         return self::$singular_name;
     }
 
-    private static $plural_name = 'Security Checks';
     public function i18n_plural_name()
     {
         return self::$plural_name;
     }
 
-    public function canCreate($member = null)
+    public function canCreate($member = null, $context = [])
     {
         return false;
     }
 
-    public function canEdit($member = null)
+    public function canEdit($member = null, $context = [])
     {
         $order = $this->Order();
         if ($order && $order->exists()) {
             $status = $order->MyStep();
-            if ($status && $status->Code == 'SECURITY_CHECK') {
+            if ($status && $status->Code === 'SECURITY_CHECK') {
                 return parent::canEdit($member);
-            } else {
-                return false;
             }
-        } else {
-            return parent::canEdit($member);
+            return false;
         }
+        return parent::canEdit($member);
     }
 
     /**
@@ -112,9 +160,9 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if ($order) {
             $member = $this->orderMember();
             $fields = parent::getCMSFields();
-            $securityIP = "";
+            $securityIP = '';
             foreach ($this->BlacklistItems() as $item) {
-                if (is_a($item, 'EcommerceSecurityIP')) {
+                if (is_a($item, EcommerceSecurityIP::class)) {
                     $securityIP = $item->Title;
                     break;
                 }
@@ -133,13 +181,13 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     'Bad'
                 );
                 if ($country) {
-                    $country = '<em>Country:</em> '. $country . '</br>';
+                    $country = '<em>Country:</em> ' . $country . '</br>';
                 }
                 $fields->addFieldToTab(
                     'Root.Main',
                     LiteralField::create(
                         'IPAddressLink',
-                        $country . '<em>Detailed Info: </em><a href="https://freegeoip.net/?q='.$securityIP.'" target="_blank">https://freegeoip.net/?q='.$securityIP.'</a>'
+                        $country . '<em>Detailed Info: </em><a href="https://freegeoip.net/?q=' . $securityIP . '" target="_blank">https://freegeoip.net/?q=' . $securityIP . '</a>'
                     ),
                     'Bad'
                 );
@@ -153,7 +201,6 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 ),
                 'Bad'
             );
-
 
             $fields->addFieldToTab(
                 'Root.MoreDetails',
@@ -176,16 +223,16 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             if ($member) {
                 $previousOrders = Order::get()
                     ->filter(
-                        array(
-                            'MemberID' => $member->ID
-                        )
+                        [
+                            'MemberID' => $member->ID,
+                        ]
                     )
                     ->exclude(
-                        array('ID' => $order->ID)
+                        ['ID' => $order->ID]
                     );
                 if ($previousOrders->count()) {
                     $fields->addFieldToTab(
-                        "Root.PreviousOrders",
+                        'Root.PreviousOrders',
                         new GridField(
                             'PreviousOrdersList',
                             'Previous Orders',
@@ -194,7 +241,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     );
                 } else {
                     $fields->addFieldToTab(
-                        "Root.PreviousOrders",
+                        'Root.PreviousOrders',
                         HeaderField::create(
                             'NoPreviousOrders',
                             'This customer does not have any previous orders'
@@ -203,18 +250,18 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 }
             }
         }
-        $allFields = array();
+        $allFields = [];
         for ($i = 1; $i < 13; $i++) {
-            $allFields["Check".$i] = "Check".$i;
+            $allFields['Check' . $i] = 'Check' . $i;
         }
         $checks = $this->Config()->get('checks_required');
         $fields->addFieldToTab(
-            "Root.Required",
+            'Root.Required',
             HeaderField::create('RequiredChecksHeader', 'Required Checks'),
             'Note'
         );
         $fields->addFieldToTab(
-            "Root.NotRequired",
+            'Root.NotRequired',
             HeaderField::create('UnrequiredChecksHeader', 'Optional Checks'),
             'Note'
         );
@@ -242,8 +289,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             } else {
                 unset($originalOptions['Whitelisted Customer']);
             }
-            if (! $this->$fieldName) {
-                $this->$fieldName = 'To do';
+            if (! $this->{$fieldName}) {
+                $this->{$fieldName} = 'To do';
             }
             $fields->replaceField(
                 $myField->ID(),
@@ -262,25 +309,25 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         }
         if (! $hasUnrequiredChecks) {
             $fields->addFieldToTab(
-                "Root.NotRequired",
+                'Root.NotRequired',
                 HeaderField::create('UnrequiredChecksHeader', 'There are no optional checks for this order.'),
                 'Note'
             );
         }
         if (! $hasRequiredChecks) {
             $fields->addFieldToTab(
-                "Root.Required",
+                'Root.Required',
                 HeaderField::create('RequiredChecksHeader', 'There are no required checks for this order.'),
                 'Note'
             );
         }
         if ($order) {
-            $implementers = ClassInfo::implementorsOf('EcommerceSecurityLogInterface');
+            $implementers = ClassInfo::implementorsOf(EcommerceSecurityLogInterface::class);
             if ($implementers) {
                 foreach ($implementers as $implementer) {
                     $class = Injector::inst()->get($implementer);
                     $fields->addFieldsToTab(
-                        "Root.Main",
+                        'Root.Main',
                         [
                             $class->getSecurityHeader(),
                             $class->getSecuritySummary($order),
@@ -289,10 +336,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
                     if ($class->getSecurityLogTable($order)) {
                         $fields->addFieldsToTab(
-                            "Root.".$class->getSecurityLogTableTabName(),
+                            'Root.' . $class->getSecurityLogTableTabName(),
                             [
                                 $class->getSecurityHeader(),
-                                $class->getSecurityLogTable($order)
+                                $class->getSecurityLogTable($order),
                             ]
                         );
                     }
@@ -308,244 +355,12 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         return $fields;
     }
 
-    protected $warningMessages = array();
-
-    protected function collateRisks()
-    {
-        $order = $this->Order();
-        $billingAddress = $order->BillingAddress();
-        $shippingAddress = $order->ShippingAddress();
-        $member = $this->orderMember();
-        $payments = $order->Payments();
-        $html = '';
-
-        $similarArray = array();
-
-        $daysAgo = $this->Config()->get('days_ago_to_check');
-        $timeFilter = array('Created:GreaterThan' => date('Y-m-d', strtotime('-'.$daysAgo.' days')).' 00:00:00');
-
-
-        //check emails from user
-        $emailArray = array();
-        if ($member) {
-            if ($member->Email) {
-                $emailArray[] = $member->Email;
-                if (OrderStatusLog_WhitelistCustomer::member_is_security_risk($member)) {
-                    $html .= '<p class="message bad">This customer has been marked as a security risk.</p>';
-                } else {
-                    if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
-                        $html .= '<p class="warning good">This customer is whitelisted.</p>';
-                    } else {
-                        $html .= '<p class="message warning">This customer is NOT whitelisted.</p>';
-                    }
-                }
-            }
-        }
-        //are there any orders with the same Member.email in the last seven days...
-        $otherOrders = Order::get_datalist_of_orders_with_submit_record()
-            ->filter(
-                array_merge(
-                    array('MemberID' => $member->ID),
-                    $timeFilter
-                )
-            )
-            ->exclude(array('ID' => $order->ID));
-        foreach ($otherOrders as $otherOrder) {
-            if (!isset($similarArray[$otherOrder->ID])) {
-                $similarArray[$otherOrder->ID] = array();
-            }
-            $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
-        }
-        //check emails from billing address
-        $emailArray = array();
-        if ($billingAddress) {
-            if ($billingAddress->Email) {
-                $emailArray[] = $billingAddress->Email;
-            }
-        }
-        //are there any orders with the same Billing.Email in the last seven days...
-        $otherBillingAddresses = BillingAddress::get()->filter(
-            array('Email' => $emailArray) + $timeFilter
-        )->exclude(array('OrderID' => $order->ID));
-        foreach ($otherBillingAddresses as $address) {
-            $otherOrder = $address->Order();
-            if (!isset($similarArray[$otherOrder->ID])) {
-                $similarArray[$otherOrder->ID] = array();
-            }
-            $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
-        }
-        //adding all emails to security checks
-        $this->blacklistCheck($emailArray, 'EcommerceSecurityEmail');
-
-
-        //phones
-        $phoneArray = array();
-        if ($billingAddress) {
-            if ($billingAddress->Phone) {
-                $phoneArray[] = $billingAddress->Phone;
-            }
-        }
-        if ($shippingAddress) {
-            if ($shippingAddress->ShippingPhone) {
-                $phoneArray[] = $shippingAddress->ShippingPhone;
-            }
-        }
-        //are there any orders with the same phone in the last xxx days...
-        $otherBillingAddresses = BillingAddress::get()->filter(
-            array('Phone' => $phoneArray) + $timeFilter
-        )->exclude(array('OrderID' => $order->ID));
-        foreach ($otherBillingAddresses as $address) {
-            $otherOrder = $address->Order();
-            if ($otherOrder && $otherOrder->ID != $order->ID) {
-                if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["Phone"] = $otherOrder;
-            }
-        }
-        $otherShippingAddresses = ShippingAddress::get()->filter(
-            array('ShippingPhone' => $phoneArray) + $timeFilter
-        )->exclude(array('OrderID' => $order->ID));
-        foreach ($otherShippingAddresses as $address) {
-            $otherOrder = $address->Order();
-            if ($otherOrder && $otherOrder->ID != $order->ID) {
-                if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["Phone"] = $otherOrder;
-            }
-        }
-        //adding all emails to security checks
-        $this->blacklistCheck($phoneArray, 'EcommerceSecurityPhone');
-
-        //addresses
-        $addressArray = array();
-        if ($billingAddress) {
-            if ($billingAddress->Address) {
-                $addressArray[] = $billingAddress->Address;
-            }
-        }
-        if ($shippingAddress) {
-            if ($shippingAddress->ShippingAddress) {
-                $addressArray[] = $shippingAddress->ShippingAddress;
-            }
-        }
-        //are there any orders with the same address in the last xxx days...
-        $otherBillingAddresses = BillingAddress::get()->filter(
-            array('Address' => $addressArray) + $timeFilter
-        )->exclude(array('OrderID' => $order->ID));
-        foreach ($otherBillingAddresses as $address) {
-            $otherOrder = $address->Order();
-            if ($otherOrder && $otherOrder->ID != $order->ID) {
-                if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
-            }
-        }
-        $otherShippingAddresses = ShippingAddress::get()
-            ->filter(
-                array('ShippingAddress' => $addressArray) + $timeFilter
-            )
-            ->exclude(array('OrderID' => $order->ID));
-        foreach ($otherShippingAddresses as $address) {
-            $otherOrder = $address->Order();
-            if ($otherOrder && $otherOrder->ID != $order->ID) {
-                if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
-            }
-        }
-        $this->blacklistCheck($addressArray, 'EcommerceSecurityAddress');
-
-
-        //IP
-        $ipArray = array();
-        $ipProxyArray = array();
-        if ($payments) {
-            foreach ($payments as $payment) {
-                if (strlen($payment->IP) > 10) {
-                    $ipArray[] = $payment->IP;
-                }
-                if (strlen($payment->ProxyIP) > 10) {
-                    $ipProxyArray[] = $payment->ProxyIP;
-                }
-            }
-        }
-        if (count($ipArray)) {
-            //are there any orders with the same IP in the xxx seven days...
-            $otherPayments = EcommercePayment::get()->filter(
-                array('IP' => $ipArray) + $timeFilter
-            )->exclude(array('OrderID' => $order->ID));
-            foreach ($otherPayments as $payment) {
-                $otherOrder = $payment->Order();
-                if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["IP"] = $otherOrder;
-            }
-            $this->blacklistCheck($ipArray, 'EcommerceSecurityIP');
-        }
-        if (count($ipProxyArray)) {
-            //are there any orders with the same Proxy in the xxx seven days...
-            $otherPayments = EcommercePayment::get()->filter(
-                array('ProxyIP' => $ipProxyArray) + $timeFilter
-            )->exclude(array('OrderID' => $order->ID));
-            foreach ($otherPayments as $payment) {
-                $otherOrder = $payment->Order();
-                if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
-                }
-                $similarArray[$otherOrder->ID]["ProxyIP"] = $otherOrder;
-            }
-            $this->blacklistCheck($ipProxyArray, 'EcommerceSecurityProxyIP');
-        }
-
-
-        if (count($this->warningMessages)) {
-            $html .= '
-                <h4 style="color: red;">Blacklisted Details</h4>
-                <ul class="SecurityCheckListOfRisks warnings" style="color: red;">';
-            foreach ($this->warningMessages as $warningMessage) {
-                $html .= $warningMessage;
-            }
-            $html .= '
-                </ul>';
-        } else {
-            $html .= '<p class="message good">No Blacklisted Data Present</p>';
-        }
-        if (count($similarArray)) {
-            $days = $this->Config()->get('days_ago_to_check');
-            $html .= '
-                <h4>Similar orders in the last '.$days.' days</h4>
-                <ul class="SecurityCheckListOfRisks otherRisks">';
-            foreach ($similarArray as $orderID => $fields) {
-                //we just loop this so we can get the order ...
-                foreach ($fields as $tempOrder) {
-                    break;
-                }
-                $html .= '
-                    <li><a href="'.$tempOrder->CMSEditLink().'">'.$tempOrder->getTitle().'</a>: with same '.implode(', and with same ', array_keys($fields)).'</li>';
-            }
-            $html .= '
-                </ul>';
-        } else {
-            $html .= '<p class="message good">No similar orders in the last '.$daysAgo.' days</p>';
-        }
-
-        return $html;
-    }
-
     public function getSecurityCleared()
     {
-        return  DBField::create_field('Boolean', ($this->pass() ? true : false));
+        return DBField::create_field(DBBoolean::class, ($this->pass() ? true : false));
     }
 
     /**
-     *
-     *
-     *
      * @param  Order $order
      * @return bool
      */
@@ -563,7 +378,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                     user_error('bad field  ....');
                 }
                 // there is a check that needs to be TRUE, but is not ...
-                if ($this->$fieldName == 'Done' || $this->$fieldName == 'Whitelisted Customer') {
+                if ($this->{$fieldName} === 'Done' || $this->{$fieldName} === 'Whitelisted Customer') {
                 } else {
                     return false;
                 }
@@ -571,8 +386,6 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         }
         return true;
     }
-
-    private static $_saved_already = 0;
 
     public function onAfterWrite()
     {
@@ -586,13 +399,13 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 $this->write();
             } else {
                 $this->SubTotal = 9999;
-                $this->Risks = "Error";
+                $this->Risks = 'Error';
                 $this->write();
             }
             if ($this->memberIsWhitelisted()) {
                 for ($i = 1; $i < 13; $i++) {
-                    $field = "Check".$i;
-                    $this->$field = 'Whitelisted Customer';
+                    $field = 'Check' . $i;
+                    $this->{$field} = 'Whitelisted Customer';
                 }
                 $this->write();
             }
@@ -613,29 +426,244 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         }
     }
 
+    protected function collateRisks()
+    {
+        $order = $this->Order();
+        $billingAddress = $order->BillingAddress();
+        $shippingAddress = $order->ShippingAddress();
+        $member = $this->orderMember();
+        $payments = $order->Payments();
+        $html = '';
+
+        $similarArray = [];
+
+        $daysAgo = $this->Config()->get('days_ago_to_check');
+        $timeFilter = ['Created:GreaterThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00'];
+
+        //check emails from user
+        $emailArray = [];
+        if ($member) {
+            if ($member->Email) {
+                $emailArray[] = $member->Email;
+                if (OrderStatusLog_WhitelistCustomer::member_is_security_risk($member)) {
+                    $html .= '<p class="message bad">This customer has been marked as a security risk.</p>';
+                } else {
+                    if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
+                        $html .= '<p class="warning good">This customer is whitelisted.</p>';
+                    } else {
+                        $html .= '<p class="message warning">This customer is NOT whitelisted.</p>';
+                    }
+                }
+            }
+        }
+        //are there any orders with the same Member.email in the last seven days...
+        $otherOrders = Order::get_datalist_of_orders_with_submit_record()
+            ->filter(
+                array_merge(
+                    ['MemberID' => $member->ID],
+                    $timeFilter
+                )
+            )
+            ->exclude(['ID' => $order->ID]);
+        foreach ($otherOrders as $otherOrder) {
+            if (! isset($similarArray[$otherOrder->ID])) {
+                $similarArray[$otherOrder->ID] = [];
+            }
+            $similarArray[$otherOrder->ID][Email::class] = $otherOrder;
+        }
+        //check emails from billing address
+        $emailArray = [];
+        if ($billingAddress) {
+            if ($billingAddress->Email) {
+                $emailArray[] = $billingAddress->Email;
+            }
+        }
+        //are there any orders with the same Billing.Email in the last seven days...
+        $otherBillingAddresses = BillingAddress::get()->filter(
+            ['Email' => $emailArray] + $timeFilter
+        )->exclude(['OrderID' => $order->ID]);
+        foreach ($otherBillingAddresses as $address) {
+            $otherOrder = $address->Order();
+            if (! isset($similarArray[$otherOrder->ID])) {
+                $similarArray[$otherOrder->ID] = [];
+            }
+            $similarArray[$otherOrder->ID][Email::class] = $otherOrder;
+        }
+        //adding all emails to security checks
+        $this->blacklistCheck($emailArray, EcommerceSecurityEmail::class);
+
+        //phones
+        $phoneArray = [];
+        if ($billingAddress) {
+            if ($billingAddress->Phone) {
+                $phoneArray[] = $billingAddress->Phone;
+            }
+        }
+        if ($shippingAddress) {
+            if ($shippingAddress->ShippingPhone) {
+                $phoneArray[] = $shippingAddress->ShippingPhone;
+            }
+        }
+        //are there any orders with the same phone in the last xxx days...
+        $otherBillingAddresses = BillingAddress::get()->filter(
+            ['Phone' => $phoneArray] + $timeFilter
+        )->exclude(['OrderID' => $order->ID]);
+        foreach ($otherBillingAddresses as $address) {
+            $otherOrder = $address->Order();
+            if ($otherOrder && $otherOrder->ID !== $order->ID) {
+                if (! isset($similarArray[$otherOrder->ID])) {
+                    $similarArray[$otherOrder->ID] = [];
+                }
+                $similarArray[$otherOrder->ID]['Phone'] = $otherOrder;
+            }
+        }
+        $otherShippingAddresses = ShippingAddress::get()->filter(
+            ['ShippingPhone' => $phoneArray] + $timeFilter
+        )->exclude(['OrderID' => $order->ID]);
+        foreach ($otherShippingAddresses as $address) {
+            $otherOrder = $address->Order();
+            if ($otherOrder && $otherOrder->ID !== $order->ID) {
+                if (! isset($similarArray[$otherOrder->ID])) {
+                    $similarArray[$otherOrder->ID] = [];
+                }
+                $similarArray[$otherOrder->ID]['Phone'] = $otherOrder;
+            }
+        }
+        //adding all emails to security checks
+        $this->blacklistCheck($phoneArray, EcommerceSecurityPhone::class);
+
+        //addresses
+        $addressArray = [];
+        if ($billingAddress) {
+            if ($billingAddress->Address) {
+                $addressArray[] = $billingAddress->Address;
+            }
+        }
+        if ($shippingAddress) {
+            if ($shippingAddress->ShippingAddress) {
+                $addressArray[] = $shippingAddress->ShippingAddress;
+            }
+        }
+        //are there any orders with the same address in the last xxx days...
+        $otherBillingAddresses = BillingAddress::get()->filter(
+            ['Address' => $addressArray] + $timeFilter
+        )->exclude(['OrderID' => $order->ID]);
+        foreach ($otherBillingAddresses as $address) {
+            $otherOrder = $address->Order();
+            if ($otherOrder && $otherOrder->ID !== $order->ID) {
+                if (! isset($similarArray[$otherOrder->ID])) {
+                    $similarArray[$otherOrder->ID] = [];
+                }
+                $similarArray[$otherOrder->ID]['Address'] = $otherOrder;
+            }
+        }
+        $otherShippingAddresses = ShippingAddress::get()
+            ->filter(
+                ['ShippingAddress' => $addressArray] + $timeFilter
+            )
+            ->exclude(['OrderID' => $order->ID]);
+        foreach ($otherShippingAddresses as $address) {
+            $otherOrder = $address->Order();
+            if ($otherOrder && $otherOrder->ID !== $order->ID) {
+                if (! isset($similarArray[$otherOrder->ID])) {
+                    $similarArray[$otherOrder->ID] = [];
+                }
+                $similarArray[$otherOrder->ID]['Address'] = $otherOrder;
+            }
+        }
+        $this->blacklistCheck($addressArray, EcommerceSecurityAddress::class);
+
+        //IP
+        $ipArray = [];
+        $ipProxyArray = [];
+        if ($payments) {
+            foreach ($payments as $payment) {
+                if (strlen($payment->IP) > 10) {
+                    $ipArray[] = $payment->IP;
+                }
+                if (strlen($payment->ProxyIP) > 10) {
+                    $ipProxyArray[] = $payment->ProxyIP;
+                }
+            }
+        }
+        if (count($ipArray)) {
+            //are there any orders with the same IP in the xxx seven days...
+            $otherPayments = EcommercePayment::get()->filter(
+                ['IP' => $ipArray] + $timeFilter
+            )->exclude(['OrderID' => $order->ID]);
+            foreach ($otherPayments as $payment) {
+                $otherOrder = $payment->Order();
+                if (! isset($similarArray[$otherOrder->ID])) {
+                    $similarArray[$otherOrder->ID] = [];
+                }
+                $similarArray[$otherOrder->ID]['IP'] = $otherOrder;
+            }
+            $this->blacklistCheck($ipArray, EcommerceSecurityIP::class);
+        }
+        if (count($ipProxyArray)) {
+            //are there any orders with the same Proxy in the xxx seven days...
+            $otherPayments = EcommercePayment::get()->filter(
+                ['ProxyIP' => $ipProxyArray] + $timeFilter
+            )->exclude(['OrderID' => $order->ID]);
+            foreach ($otherPayments as $payment) {
+                $otherOrder = $payment->Order();
+                if (! isset($similarArray[$otherOrder->ID])) {
+                    $similarArray[$otherOrder->ID] = [];
+                }
+                $similarArray[$otherOrder->ID]['ProxyIP'] = $otherOrder;
+            }
+            $this->blacklistCheck($ipProxyArray, EcommerceSecurityProxyIP::class);
+        }
+
+        if (count($this->warningMessages)) {
+            $html .= '
+                <h4 style="color: red;">Blacklisted Details</h4>
+                <ul class="SecurityCheckListOfRisks warnings" style="color: red;">';
+            foreach ($this->warningMessages as $warningMessage) {
+                $html .= $warningMessage;
+            }
+            $html .= '
+                </ul>';
+        } else {
+            $html .= '<p class="message good">No Blacklisted Data Present</p>';
+        }
+        if (count($similarArray)) {
+            $days = $this->Config()->get('days_ago_to_check');
+            $html .= '
+                <h4>Similar orders in the last ' . $days . ' days</h4>
+                <ul class="SecurityCheckListOfRisks otherRisks">';
+            foreach ($similarArray as $orderID => $fields) {
+                //we just loop this so we can get the order ...
+                foreach ($fields as $tempOrder) {
+                    break;
+                }
+                $html .= '
+                    <li><a href="' . $tempOrder->CMSEditLink() . '">' . $tempOrder->getTitle() . '</a>: with same ' . implode(', and with same ', array_keys($fields)) . '</li>';
+            }
+            $html .= '
+                </ul>';
+        } else {
+            $html .= '<p class="message good">No similar orders in the last ' . $daysAgo . ' days</p>';
+        }
+
+        return $html;
+    }
+
     /**
-     *
      * @param  EcommerceSecurityBaseClass $obj
      * @return bool                             return true if the status of the object is `Bad`
      */
     protected function checkSecurityObject($obj)
     {
-        if ($obj->Status == 'Bad') {
+        if ($obj->Status === 'Bad') {
             return false;
         }
         return true;
     }
 
-    /**
-     * caching variable only...
-     *
-     * @var null | bool
-     */
-    private $_memberIsWhitelisted = null;
-
     protected function memberIsWhitelisted()
     {
-        if ($this->_memberIsWhitelisted  === null) {
+        if ($this->_memberIsWhitelisted === null) {
             if ($member = $this->orderMember()) {
                 $this->_memberIsWhitelisted = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
             }
@@ -644,8 +672,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     }
 
     /**
-     *
-     * @return null | Member
+     * @return Member|null
      */
     protected function orderMember()
     {
@@ -663,12 +690,12 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         //adding all emails to security checks
         foreach ($arrayOfValues as $value) {
             if ($value) {
-                $obj = $securityClass::find_or_create(array("Title" => $value));
+                $obj = $securityClass::find_or_create(['Title' => $value]);
                 if ($obj->exists()) {
                     $this->BlacklistItems()->add($obj);
                     if ($obj->hasRisks()) {
                         $title = $obj->i18n_singular_name();
-                        $message = '<li><strong>'.$title.':</strong> '.$value.'<li>';
+                        $message = '<li><strong>' . $title . ':</strong> ' . $value . '<li>';
                         $this->warningMessages[$message] = $message;
                     }
                 }

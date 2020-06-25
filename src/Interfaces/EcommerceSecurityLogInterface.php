@@ -1,4 +1,7 @@
 <?php
+
+namespace Sunnysideup\EcommerceSecurity\Interfaces;
+
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
  * @package: ecommerce

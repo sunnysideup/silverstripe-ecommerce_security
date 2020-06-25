@@ -1,6 +1,6 @@
 {
     "name": "sunnysideup/ecommerce_security",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "description": "Add additional security checks to your Silverstripe e-commerce install.",
     "keywords": [
         "Silverstripe-CMS",
@@ -21,11 +21,13 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "~3.6",
         "sunnysideup/ecommerce": "*",
-        "silverstripe/cms": "~3.6"
+        "silverstripe/recipe-cms": "^4.4"
     },
-    "extra": {
-        "installer-name": "ecommerce_security"
+    "extra": [],
+    "autoload": {
+        "psr-4": {
+            "Sunnysideup\\EcommerceSecurity\\": "src/"
+        }
     }
 }
