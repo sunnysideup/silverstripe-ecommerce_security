@@ -1,5 +1,13 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Process;
+
+use OrderStatusLog;
+use CMSEditLinkField;
+use Member;
+use Order;
+
+
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz

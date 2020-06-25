@@ -1,5 +1,12 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Process;
+
+use OrderStep;
+use OrderStepInterface;
+use Order;
+
+
 class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterface
 {
     private static $defaults = array(

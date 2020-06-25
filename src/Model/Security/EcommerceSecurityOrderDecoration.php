@@ -1,5 +1,15 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Security;
+
+use DataExtension;
+use FieldList;
+use OrderStep;
+use HeaderField;
+use CheckboxField;
+use OrderStatusLog_SecurityCheck;
+
+
 
 /**
   * ### @@@@ START REPLACEMENT @@@@ ###

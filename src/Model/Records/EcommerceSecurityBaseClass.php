@@ -1,5 +1,16 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Records;
+
+use DataObject;
+use Config;
+use Member;
+use Permission;
+use ReadonlyField;
+use ClassInfo;
+use EcommerceClassNameOrTypeDropdownField;
+
+
 
 class EcommerceSecurityBaseClass extends DataObject
 {

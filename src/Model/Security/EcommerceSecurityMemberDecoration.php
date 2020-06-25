@@ -1,5 +1,11 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Security;
+
+use DataExtension;
+use EcommerceSecurityEmail;
+
+
 
 /**
   * ### @@@@ START REPLACEMENT @@@@ ###

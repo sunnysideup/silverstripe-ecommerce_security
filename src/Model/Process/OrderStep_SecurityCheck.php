@@ -1,5 +1,14 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Process;
+
+use OrderStep;
+use OrderStepInterface;
+use Order;
+use FieldList;
+use EcommerceCMSButtonField;
+
+
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
  * @package: ecommerce

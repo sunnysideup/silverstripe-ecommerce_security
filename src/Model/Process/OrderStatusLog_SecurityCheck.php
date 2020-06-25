@@ -1,5 +1,23 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Process;
+
+use OrderStatusLog;
+use GeoIP;
+use HeaderField;
+use LiteralField;
+use HTMLEditorField;
+use Order;
+use GridField;
+use OptionsetField;
+use ClassInfo;
+use Injector;
+use BillingAddress;
+use ShippingAddress;
+use EcommercePayment;
+use DBField;
+
+
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz

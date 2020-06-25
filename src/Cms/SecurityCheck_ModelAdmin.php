@@ -1,5 +1,10 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Cms;
+
+use ModelAdminEcommerceBaseClass;
+
+
 
 /**
  * @description: CMS management for everything you have sold and all related data (e.g. logs, payments)

@@ -1,5 +1,10 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecurity\Model\Records;
+
+
+
+
 
 class EcommerceSecurityEmail extends EcommerceSecurityBaseClass
 {
