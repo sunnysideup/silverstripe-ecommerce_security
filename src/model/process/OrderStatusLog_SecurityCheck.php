@@ -49,7 +49,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
      *
      * @var array
      */
-    private static $checks_required = array();
+    private static $checks_required = [];
 
     private static $summary_fields = array(
         'Type' => 'Type',
@@ -82,12 +82,12 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         return self::$plural_name;
     }
 
-    public function canCreate($member = null)
+    public function canCreate($member = null, $context = [])
     {
         return false;
     }
 
-    public function canEdit($member = null)
+    public function canEdit($member = null, $context = [])
     {
         $order = $this->Order();
         if ($order && $order->exists()) {
@@ -203,7 +203,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
                 }
             }
         }
-        $allFields = array();
+        $allFields = [];
         for ($i = 1; $i < 13; $i++) {
             $allFields["Check".$i] = "Check".$i;
         }
@@ -308,7 +308,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         return $fields;
     }
 
-    protected $warningMessages = array();
+    protected $warningMessages = [];
 
     protected function collateRisks()
     {
@@ -319,14 +319,14 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $payments = $order->Payments();
         $html = '';
 
-        $similarArray = array();
+        $similarArray = [];
 
         $daysAgo = $this->Config()->get('days_ago_to_check');
         $timeFilter = array('Created:GreaterThan' => date('Y-m-d', strtotime('-'.$daysAgo.' days')).' 00:00:00');
 
 
         //check emails from user
-        $emailArray = array();
+        $emailArray = [];
         if ($member) {
             if ($member->Email) {
                 $emailArray[] = $member->Email;
@@ -352,12 +352,12 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             ->exclude(array('ID' => $order->ID));
         foreach ($otherOrders as $otherOrder) {
             if (!isset($similarArray[$otherOrder->ID])) {
-                $similarArray[$otherOrder->ID] = array();
+                $similarArray[$otherOrder->ID] = [];
             }
             $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
         }
         //check emails from billing address
-        $emailArray = array();
+        $emailArray = [];
         if ($billingAddress) {
             if ($billingAddress->Email) {
                 $emailArray[] = $billingAddress->Email;
@@ -370,7 +370,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         foreach ($otherBillingAddresses as $address) {
             $otherOrder = $address->Order();
             if (!isset($similarArray[$otherOrder->ID])) {
-                $similarArray[$otherOrder->ID] = array();
+                $similarArray[$otherOrder->ID] = [];
             }
             $similarArray[$otherOrder->ID]["Email"] = $otherOrder;
         }
@@ -379,7 +379,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
 
         //phones
-        $phoneArray = array();
+        $phoneArray = [];
         if ($billingAddress) {
             if ($billingAddress->Phone) {
                 $phoneArray[] = $billingAddress->Phone;
@@ -398,7 +398,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             $otherOrder = $address->Order();
             if ($otherOrder && $otherOrder->ID != $order->ID) {
                 if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
+                    $similarArray[$otherOrder->ID] = [];
                 }
                 $similarArray[$otherOrder->ID]["Phone"] = $otherOrder;
             }
@@ -410,7 +410,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             $otherOrder = $address->Order();
             if ($otherOrder && $otherOrder->ID != $order->ID) {
                 if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
+                    $similarArray[$otherOrder->ID] = [];
                 }
                 $similarArray[$otherOrder->ID]["Phone"] = $otherOrder;
             }
@@ -419,7 +419,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         $this->blacklistCheck($phoneArray, 'EcommerceSecurityPhone');
 
         //addresses
-        $addressArray = array();
+        $addressArray = [];
         if ($billingAddress) {
             if ($billingAddress->Address) {
                 $addressArray[] = $billingAddress->Address;
@@ -438,7 +438,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             $otherOrder = $address->Order();
             if ($otherOrder && $otherOrder->ID != $order->ID) {
                 if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
+                    $similarArray[$otherOrder->ID] = [];
                 }
                 $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
             }
@@ -452,7 +452,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             $otherOrder = $address->Order();
             if ($otherOrder && $otherOrder->ID != $order->ID) {
                 if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
+                    $similarArray[$otherOrder->ID] = [];
                 }
                 $similarArray[$otherOrder->ID]["Address"] = $otherOrder;
             }
@@ -461,8 +461,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
 
         //IP
-        $ipArray = array();
-        $ipProxyArray = array();
+        $ipArray = [];
+        $ipProxyArray = [];
         if ($payments) {
             foreach ($payments as $payment) {
                 if (strlen($payment->IP) > 10) {
@@ -481,7 +481,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             foreach ($otherPayments as $payment) {
                 $otherOrder = $payment->Order();
                 if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
+                    $similarArray[$otherOrder->ID] = [];
                 }
                 $similarArray[$otherOrder->ID]["IP"] = $otherOrder;
             }
@@ -495,7 +495,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
             foreach ($otherPayments as $payment) {
                 $otherOrder = $payment->Order();
                 if (!isset($similarArray[$otherOrder->ID])) {
-                    $similarArray[$otherOrder->ID] = array();
+                    $similarArray[$otherOrder->ID] = [];
                 }
                 $similarArray[$otherOrder->ID]["ProxyIP"] = $otherOrder;
             }

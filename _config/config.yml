@@ -1,14 +1,14 @@
 ---
 Name: ecommerce_security
 Before:
-  - 'mysite/*'
+  - 'app/*'
 After:
   - 'framework/*'
   - 'cms/*'
   - 'ecommerce/*'
 ---
 
-Member:
+SilverStripe\Security\Member:
   extensions:
     - EcommerceSecurityMemberDecoration
 
@@ -36,11 +36,11 @@ After:
   - 'framework/*'
   - 'cms/*'
   - 'ecommerce/*'
-  - 'mysite/*'
+  - 'app/*'
 Only:
   moduleexists: 'grouped-cms-menu'
 ---
-LeftAndMain:
+SilverStripe\Admin\LeftAndMain:
   menu_groups:
     Shop:
       - SecurityCheck_ModelAdmin

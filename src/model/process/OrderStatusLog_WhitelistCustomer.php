@@ -53,17 +53,17 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         return self::$plural_name;
     }
 
-    public function canCreate($member = null)
+    public function canCreate($member = null, $context = [])
     {
         return false;
     }
 
-    public function canEdit($member = null)
+    public function canEdit($member = null, $context = [])
     {
         return parent::canEdit($member);
     }
 
-    public function canDelete($member = null)
+    public function canDelete($member = null, $context = [])
     {
         return false;
     }
@@ -73,6 +73,15 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         $fields = parent::getCMSFields();
         $fields->replaceField(
             'BasedOnID',
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: LinkField (case sensitive)
+  * NEW: LinkField (COMPLEX)
+  * EXP: You may need to run the following class: https://github.com/sunnysideup/silverstripe-migration-task/blob/master/src/Tasks/FixSheaDawsonLink.php
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
             CMSEditLinkField::create(
                 'BasedOnID',
                 _t('OrderStatusLog_WhitelistCustomer.BASED_ON', 'Based on'),
@@ -81,6 +90,15 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
         );
         $fields->replaceField(
             'MemberID',
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: LinkField (case sensitive)
+  * NEW: LinkField (COMPLEX)
+  * EXP: You may need to run the following class: https://github.com/sunnysideup/silverstripe-migration-task/blob/master/src/Tasks/FixSheaDawsonLink.php
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
             CMSEditLinkField::create(
                 'MemberID',
                 _t('OrderStatusLog_WhitelistCustomer.CUSTOMER', 'Customer'),
