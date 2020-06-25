@@ -1,0 +1,16 @@
+SilverStripe\ORM\DatabaseAdmin:
+  classname_value_remapping:
+    EcommerceSecurityLogInterface: Sunnysideup\EcommerceSecurity\Interfaces\EcommerceSecurityLogInterface
+    EcommerceSecurityIP: Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityIP
+    EcommerceSecurityPhone: Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityPhone
+    EcommerceSecurityBaseClass: Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass
+    EcommerceSecurityAddress: Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityAddress
+    EcommerceSecurityProxyIP: Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityProxyIP
+    EcommerceSecurityEmail: Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail
+    OrderStep_SecurityCheck: Sunnysideup\EcommerceSecurity\Model\Process\OrderStep_SecurityCheck
+    OrderStatusLog_SecurityCheck: Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck
+    OrderStatusLog_WhitelistCustomer: Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_WhitelistCustomer
+    OrderStep_WhitelistCustomer: Sunnysideup\EcommerceSecurity\Model\Process\OrderStep_WhitelistCustomer
+    EcommerceSecurityOrderDecoration: Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityOrderDecoration
+    EcommerceSecurityMemberDecoration: Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityMemberDecoration
+    SecurityCheck_ModelAdmin: Sunnysideup\EcommerceSecurity\Cms\SecurityCheck_ModelAdmin
