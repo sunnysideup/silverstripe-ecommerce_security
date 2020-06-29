@@ -10,26 +10,8 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck;
 use Sunnysideup\EcommerceSecurity\Model\Process\OrderStep_SecurityCheck;
 
-/**
- * ### @@@@ START REPLACEMENT @@@@ ###
- * WHY: automated upgrade
- * OLD:  extends DataExtension (ignore case)
- * NEW:  extends DataExtension (COMPLEX)
- * EXP: Check for use of $this->anyVar and replace with $this->anyVar[$this->owner->ID] or consider turning the class into a trait
- * ### @@@@ STOP REPLACEMENT @@@@ ###
- */
 class EcommerceSecurityOrderDecoration extends DataExtension
 {
-    /**
-     * ### @@@@ START REPLACEMENT @@@@ ###
-     * OLD: private static $db (case sensitive)
-     * NEW:
-    private static $db (COMPLEX)
-     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-     * ### @@@@ STOP REPLACEMENT @@@@ ###
-     */
-    private static $table_name = 'EcommerceSecurityOrderDecoration';
-
     private static $db = [
         'SkipToSecurityChecks' => 'Boolean',
     ];

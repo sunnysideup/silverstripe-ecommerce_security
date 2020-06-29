@@ -20,14 +20,6 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
      */
     private static $min_number_of_paid_orders_required = 1;
 
-    /**
-     * ### @@@@ START REPLACEMENT @@@@ ###
-     * OLD: private static $db (case sensitive)
-     * NEW:
-    private static $db (COMPLEX)
-     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-     * ### @@@@ STOP REPLACEMENT @@@@ ###
-     */
     private static $table_name = 'OrderStatusLog_WhitelistCustomer';
 
     private static $db = [

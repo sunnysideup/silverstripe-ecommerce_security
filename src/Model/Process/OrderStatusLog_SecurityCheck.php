@@ -50,6 +50,8 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
 
     private static $days_ago_to_check = 14;
 
+    private static $table_name = 'OrderStatusLog_SecurityCheck';
+
     private static $db = [
         'Bad' => 'Boolean',
         'Risks' => 'HTMLText',

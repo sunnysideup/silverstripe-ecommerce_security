@@ -26,14 +26,6 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     private static $plural_name = 'Blacklisted Items';
 
-    /**
-     * ### @@@@ START REPLACEMENT @@@@ ###
-     * OLD: private static $db (case sensitive)
-     * NEW:
-    private static $db (COMPLEX)
-     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-     * ### @@@@ STOP REPLACEMENT @@@@ ###
-     */
     private static $table_name = 'EcommerceSecurityBaseClass';
 
     private static $db = [
@@ -59,7 +51,10 @@ class EcommerceSecurityBaseClass extends DataObject
     ];
 
     private static $indexes = [
-        'ClassName_Title' => ['type' => 'unique', 'value' => '"ClassName","Title"'],
+        'ClassName_Title' => [
+            'type' => 'unique',
+            'columns' => ['ClassName', 'Title'],
+        ],
         'Title' => true,
         'ClassName' => true,
     ];
@@ -81,29 +76,11 @@ class EcommerceSecurityBaseClass extends DataObject
 
     public function i18n_singular_name()
     {
-
-        /**
-         * ### @@@@ START REPLACEMENT @@@@ ###
-         * WHY: automated upgrade
-         * OLD: $this->ClassName (case sensitive)
-         * NEW: $this->ClassName (COMPLEX)
-         * EXP: Check if the class name can still be used as such
-         * ### @@@@ STOP REPLACEMENT @@@@ ###
-         */
         return Config::inst()->get($this->ClassName, 'singular_name');
     }
 
     public function i18n_plural_name()
     {
-
-        /**
-         * ### @@@@ START REPLACEMENT @@@@ ###
-         * WHY: automated upgrade
-         * OLD: $this->ClassName (case sensitive)
-         * NEW: $this->ClassName (COMPLEX)
-         * EXP: Check if the class name can still be used as such
-         * ### @@@@ STOP REPLACEMENT @@@@ ###
-         */
         return Config::inst()->get($this->ClassName, 'plural_name');
     }
 
@@ -120,50 +97,14 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     public static function find_or_create($filterArray, $write = true)
     {
-
-        /**
-         * ### @@@@ START REPLACEMENT @@@@ ###
-         * WHY: automated upgrade
-         * OLD: $className (case sensitive)
-         * NEW: $className (COMPLEX)
-         * EXP: Check if the class name can still be used as such
-         * ### @@@@ STOP REPLACEMENT @@@@ ###
-         */
         $className = static::class;
         //we dont want empty ones so we just return a temp object...
         if (empty($filterArray['Title'])) {
             $obj = EcommerceSecurityBaseClass::create();
         } else {
-
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD: $className (case sensitive)
-             * NEW: $className (COMPLEX)
-             * EXP: Check if the class name can still be used as such
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
             $filterArray['ClassName'] = $className;
-
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD: $className (case sensitive)
-             * NEW: $className (COMPLEX)
-             * EXP: Check if the class name can still be used as such
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
             $obj = $className::get()->filter($filterArray)->first();
             if (! $obj) {
-
-                /**
-                 * ### @@@@ START REPLACEMENT @@@@ ###
-                 * WHY: automated upgrade
-                 * OLD: $className (case sensitive)
-                 * NEW: $className (COMPLEX)
-                 * EXP: Check if the class name can still be used as such
-                 * ### @@@@ STOP REPLACEMENT @@@@ ###
-                 */
                 $obj = $className::create($filterArray);
                 if ($write) {
                     $obj->write();
@@ -235,25 +176,7 @@ class EcommerceSecurityBaseClass extends DataObject
                 $fields->dataFieldByName('Title')->setTitle($labels['Title'])->performReadonlyTransformation()
             );
         } else {
-
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD: $this->ClassName (case sensitive)
-             * NEW: $this->ClassName (COMPLEX)
-             * EXP: Check if the class name can still be used as such
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
             $availableClasses = ClassInfo::subclassesFor($this->ClassName);
-
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD: $this->ClassName (case sensitive)
-             * NEW: $this->ClassName (COMPLEX)
-             * EXP: Check if the class name can still be used as such
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
             unset($availableClasses[$this->ClassName]);
             $fields->addFieldToTab(
                 'Root.Main',

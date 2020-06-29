@@ -5,26 +5,8 @@ namespace Sunnysideup\EcommerceSecurity\Model\Security;
 use SilverStripe\ORM\DataExtension;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
 
-/**
- * ### @@@@ START REPLACEMENT @@@@ ###
- * WHY: automated upgrade
- * OLD:  extends DataExtension (ignore case)
- * NEW:  extends DataExtension (COMPLEX)
- * EXP: Check for use of $this->anyVar and replace with $this->anyVar[$this->owner->ID] or consider turning the class into a trait
- * ### @@@@ STOP REPLACEMENT @@@@ ###
- */
 class EcommerceSecurityMemberDecoration extends DataExtension
 {
-    /**
-     * ### @@@@ START REPLACEMENT @@@@ ###
-     * OLD: private static $db (case sensitive)
-     * NEW:
-    private static $db (COMPLEX)
-     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-     * ### @@@@ STOP REPLACEMENT @@@@ ###
-     */
-    private static $table_name = 'EcommerceSecurityMemberDecoration';
-
     private static $db = [
         'IsWhitelisted' => 'Boolean',
         'IsSecurityRisk' => 'Boolean',

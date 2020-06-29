@@ -1,11 +1,11 @@
 ---
 Name: ecommerce_security
 Before:
-  - 'app/*'
-After:
-  - 'framework/*'
-  - 'cms/*'
-  - 'ecommerce/*'
+  - '#app'
+After: 
+  - '#coreconfig'
+  - '#cmsextensions'
+  - '#ecommerce'
 ---
 SilverStripe\Security\Member:
   extensions:
@@ -24,11 +24,11 @@ Sunnysideup\Ecommerce\Model\Process\OrderStatusLog:
     - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck
     - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_WhitelistCustomer
 ---
-After:
-  - 'framework/*'
-  - 'cms/*'
-  - 'ecommerce/*'
-  - 'app/*'
+After: 
+  - '#coreconfig'
+  - '#cmsextensions'
+  - '#ecommerce'
+  - '#app'
 Only:
   moduleexists: 'grouped-cms-menu'
 ---
