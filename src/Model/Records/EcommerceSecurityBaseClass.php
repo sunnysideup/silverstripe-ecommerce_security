@@ -159,7 +159,7 @@ class EcommerceSecurityBaseClass extends DataObject
 
     /**
      * CMS Fields
-     * @return FieldList
+     * @return \SilverStripe\Forms\FieldList
      */
     public function getCMSFields()
     {

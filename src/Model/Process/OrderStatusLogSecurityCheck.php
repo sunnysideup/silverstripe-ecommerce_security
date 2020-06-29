@@ -154,14 +154,14 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
 
     /**
      * CMS Fields
-     * @return FieldList
+     * @return \SilverStripe\Forms\FieldList
      */
     public function getCMSFields()
     {
+        $fields = parent::getCMSFields();
         $order = $this->Order();
         if ($order) {
             $member = $this->orderMember();
-            $fields = parent::getCMSFields();
             $securityIP = '';
             foreach ($this->BlacklistItems() as $item) {
                 if (is_a($item, EcommerceSecurityIP::class)) {
@@ -635,12 +635,15 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 <h4>Similar orders in the last ' . $days . ' days</h4>
                 <ul class="SecurityCheckListOfRisks otherRisks">';
             foreach ($similarArray as $orderID => $fields) {
+                $tempOrder = null;
                 //we just loop this so we can get the order ...
                 foreach ($fields as $tempOrder) {
                     break;
                 }
-                $html .= '
+                if($tempOrder){
+                    $html .= '
                     <li><a href="' . $tempOrder->CMSEditLink() . '">' . $tempOrder->getTitle() . '</a>: with same ' . implode(', and with same ', array_keys($fields)) . '</li>';
+                }
             }
             $html .= '
                 </ul>';
@@ -674,7 +677,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     }
 
     /**
-     * @return Member|null
+     * @return \SilverStripe\Security\Member|null
      */
     protected function orderMember()
     {
