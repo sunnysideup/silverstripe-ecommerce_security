@@ -14,15 +14,16 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStep;
  * @sub-package: model
  * @inspiration: Silverstripe Ltd, Jeremy
  **/
-class OrderStep_SecurityCheck extends OrderStep implements OrderStepInterface
+class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
 {
-    private static $table_name = 'OrderStep_SecurityCheck';
     /**
      * The OrderStatusLog that is relevant to the particular step.
      *
      * @var string
      */
-    protected $relevantLogEntryClassName = OrderStatusLog_SecurityCheck::class;
+    protected $relevantLogEntryClassName = OrderStatusLogSecurityCheck::class;
+
+    private static $table_name = 'OrderStepSecurityCheck';
 
     private static $defaults = [
         'CustomerCanEdit' => 0,
@@ -122,11 +123,11 @@ class OrderStep_SecurityCheck extends OrderStep implements OrderStepInterface
     {
         $fields = parent::addOrderStepFields($fields, $order);
         $title = _t('OrderStep.MUST_ACTION_SECURITY_CHECKS', ' ... To move this order to the next step you have to carry out a bunch of security checks.');
-        $field = $order->getOrderStatusLogsTableFieldEditable(OrderStatusLog_SecurityCheck::class, $title);
+        $field = $order->getOrderStatusLogsTableFieldEditable(OrderStatusLogSecurityCheck::class, $title);
         $logEntry = $this->RelevantLogEntry($order);
-        $link = '/admin/sales/Order/EditForm/field/Order/item/' . $order->ID . '/ItemEditForm/field/OrderStatusLog_SecurityCheck/item/' . $logEntry->ID . '/edit';
+        $link = '/admin/sales/Order/EditForm/field/Order/item/' . $order->ID . '/ItemEditForm/field/OrderStatusLogSecurityCheck/item/' . $logEntry->ID . '/edit';
         $button = EcommerceCMSButtonField::create(
-            'OrderStatusLog_SecurityCheck_Button',
+            'OrderStatusLogSecurityCheck_Button',
             $link,
             'Open Security Checks'
         );

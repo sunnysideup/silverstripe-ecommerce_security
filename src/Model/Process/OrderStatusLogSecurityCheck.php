@@ -44,13 +44,13 @@ use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityProxyIP;
  * @sub-package: model
  * @inspiration: Silverstripe Ltd, Jeremy
  **/
-class OrderStatusLog_SecurityCheck extends OrderStatusLog
+class OrderStatusLogSecurityCheck extends OrderStatusLog
 {
     protected $warningMessages = [];
 
     private static $days_ago_to_check = 14;
 
-    private static $table_name = 'OrderStatusLog_SecurityCheck';
+    private static $table_name = 'OrderStatusLogSecurityCheck';
 
     private static $db = [
         'Bad' => 'Boolean',
@@ -447,10 +447,10 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
         if ($member) {
             if ($member->Email) {
                 $emailArray[] = $member->Email;
-                if (OrderStatusLog_WhitelistCustomer::member_is_security_risk($member)) {
+                if (OrderStatusLogWhitelistCustomer::member_is_security_risk($member)) {
                     $html .= '<p class="message bad">This customer has been marked as a security risk.</p>';
                 } else {
-                    if (OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member)) {
+                    if (OrderStatusLogWhitelistCustomer::member_is_whitelisted($member)) {
                         $html .= '<p class="warning good">This customer is whitelisted.</p>';
                     } else {
                         $html .= '<p class="message warning">This customer is NOT whitelisted.</p>';
@@ -667,7 +667,7 @@ class OrderStatusLog_SecurityCheck extends OrderStatusLog
     {
         if ($this->_memberIsWhitelisted === null) {
             if ($member = $this->orderMember()) {
-                $this->_memberIsWhitelisted = OrderStatusLog_WhitelistCustomer::member_is_whitelisted($member);
+                $this->_memberIsWhitelisted = OrderStatusLogWhitelistCustomer::member_is_whitelisted($member);
             }
         }
         return $this->_memberIsWhitelisted;

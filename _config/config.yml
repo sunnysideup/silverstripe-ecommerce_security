@@ -10,19 +10,19 @@ After:
 SilverStripe\Security\Member:
   extensions:
     - Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityMemberDecoration
-Sunnysideup\EcommerceSecurity\Cms\SecurityCheck_ModelAdmin:
+Sunnysideup\EcommerceSecurity\Cms\SecurityCheckModelAdmin:
   managed_models:
     - Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass
 Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole:
   admin_role_permission_codes:
-    - CMS_ACCESS_SecurityCheck_ModelAdmin
+    - CMS_ACCESS_SecurityCheckModelAdmin
 Sunnysideup\Ecommerce\Model\Order:
   extensions:
     - Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityOrderDecoration
 Sunnysideup\Ecommerce\Model\Process\OrderStatusLog:
   available_log_classes_array:
-    - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck
-    - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_WhitelistCustomer
+    - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck
+    - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogWhitelistCustomer
 ---
 After: 
   - '#coreconfig'
@@ -35,4 +35,4 @@ Only:
 SilverStripe\Admin\LeftAndMain:
   menu_groups:
     Shop:
-      - Sunnysideup\EcommerceSecurity\Cms\SecurityCheck_ModelAdmin
+      - Sunnysideup\EcommerceSecurity\Cms\SecurityCheckModelAdmin

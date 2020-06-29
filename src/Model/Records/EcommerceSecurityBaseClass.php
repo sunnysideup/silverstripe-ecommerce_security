@@ -10,7 +10,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceClassNameOrTypeDropdownField;
 use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
-use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
 
 class EcommerceSecurityBaseClass extends DataObject
 {
@@ -34,7 +34,7 @@ class EcommerceSecurityBaseClass extends DataObject
     ];
 
     private static $belongs_many_many = [
-        'SecurityChecks' => OrderStatusLog_SecurityCheck::class,
+        'SecurityChecks' => OrderStatusLogSecurityCheck::class,
     ];
 
     private static $casting = [

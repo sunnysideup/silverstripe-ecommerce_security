@@ -12,7 +12,7 @@ use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
  * @sub-package: cms
  * @inspiration: Silverstripe Ltd, Jeremy
  **/
-class SecurityCheck_ModelAdmin extends ModelAdminEcommerceBaseClass
+class SecurityCheckModelAdmin extends ModelAdminEcommerceBaseClass
 {
     /**
      * Change this variable if you don't want the Import from CSV form to appear.

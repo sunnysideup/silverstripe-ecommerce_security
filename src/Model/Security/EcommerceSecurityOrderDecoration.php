@@ -7,8 +7,8 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\ORM\DataExtension;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
-use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLog_SecurityCheck;
-use Sunnysideup\EcommerceSecurity\Model\Process\OrderStep_SecurityCheck;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
+use Sunnysideup\EcommerceSecurity\Model\Process\OrderStepSecurityCheck;
 
 class EcommerceSecurityOrderDecoration extends DataExtension
 {
@@ -20,7 +20,7 @@ class EcommerceSecurityOrderDecoration extends DataExtension
     {
         if ($this->owner->IsSubmitted()) {
             $currentStep = $this->owner->MyStep()->Sort;
-            $securityStep = OrderStep::get()->filter(['ClassName' => OrderStep_SecurityCheck::class])->first()->Sort;
+            $securityStep = OrderStep::get()->filter(['ClassName' => OrderStepSecurityCheck::class])->first()->Sort;
             if (! $this->owner->IsPaid() && $currentStep < $securityStep) {
                 $fields->addFieldsToTab(
                     'Root.Next',
@@ -49,14 +49,14 @@ class EcommerceSecurityOrderDecoration extends DataExtension
     {
         parent::onBeforeWrite();
         if ($this->owner->SkipToSecurityChecks) {
-            $logCount = OrderStatusLog_SecurityCheck::get()->filter(['OrderID' => $this->owner->ID])->count();
+            $logCount = OrderStatusLogSecurityCheck::get()->filter(['OrderID' => $this->owner->ID])->count();
             if ($logCount) {
                 //do nothing - the security check already exists
             } else {
-                $securityCheck = OrderStatusLog_SecurityCheck::create();
+                $securityCheck = OrderStatusLogSecurityCheck::create();
                 $securityCheck->OrderID = $this->owner->ID;
                 $securityCheck->write();
-                $securityStepID = OrderStep::get()->filter(['ClassName' => OrderStep_SecurityCheck::class])->first()->ID;
+                $securityStepID = OrderStep::get()->filter(['ClassName' => OrderStepSecurityCheck::class])->first()->ID;
                 if ($securityStepID) {
                     $this->owner->StatusID = $securityStepID;
                 }

@@ -13,14 +13,14 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
  * @sub-package: model
  * @inspiration: Silverstripe Ltd, Jeremy
  **/
-class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
+class OrderStatusLogWhitelistCustomer extends OrderStatusLog
 {
     /**
      * @var int
      */
     private static $min_number_of_paid_orders_required = 1;
 
-    private static $table_name = 'OrderStatusLog_WhitelistCustomer';
+    private static $table_name = 'OrderStatusLogWhitelistCustomer';
 
     private static $db = [
         'Whitelist' => 'Boolean',
@@ -28,7 +28,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
 
     private static $has_one = [
         'Member' => Member::class,
-        'BasedOn' => OrderStatusLog_WhitelistCustomer::class,
+        'BasedOn' => OrderStatusLogWhitelistCustomer::class,
     ];
 
     private static $defaults = [
@@ -79,7 +79,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
              */
             CMSEditLinkField::create(
                 'BasedOnID',
-                _t('OrderStatusLog_WhitelistCustomer.BASED_ON', 'Based on'),
+                _t('OrderStatusLogWhitelistCustomer.BASED_ON', 'Based on'),
                 $this->BasedOn()
             )
         );
@@ -95,7 +95,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
              */
             CMSEditLinkField::create(
                 'MemberID',
-                _t('OrderStatusLog_WhitelistCustomer.CUSTOMER', 'Customer'),
+                _t('OrderStatusLogWhitelistCustomer.CUSTOMER', 'Customer'),
                 $this->Member()
             )
         );
@@ -150,7 +150,7 @@ class OrderStatusLog_WhitelistCustomer extends OrderStatusLog
                 $member = $order->Member();
                 if ($member && $member->exists()) {
                     //check if member has previouly been whitelisted
-                    $previousOne = OrderStatusLog_WhitelistCustomer::get()
+                    $previousOne = OrderStatusLogWhitelistCustomer::get()
                         ->filter(
                             [
                                 'Whitelist' => 1,

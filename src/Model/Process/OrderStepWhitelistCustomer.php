@@ -6,14 +6,14 @@ use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 
-class OrderStep_WhitelistCustomer extends OrderStep implements OrderStepInterface
+class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
 {
     /**
      * The OrderStatusLog that is relevant to the particular step.
      *
      * @var string
      */
-    protected $relevantLogEntryClassName = OrderStatusLog_WhitelistCustomer::class;
+    protected $relevantLogEntryClassName = OrderStatusLogWhitelistCustomer::class;
 
     private static $defaults = [
         'CustomerCanEdit' => 0,
