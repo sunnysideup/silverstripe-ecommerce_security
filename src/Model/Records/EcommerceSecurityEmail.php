@@ -19,6 +19,6 @@ class EcommerceSecurityEmail extends EcommerceSecurityBaseClass
     private static $plural_name = 'Blacklisted Emails';
 
     private static $field_labels = [
-        'Title' => Email::class,
+        'Title' => 'Email',
     ];
 }
