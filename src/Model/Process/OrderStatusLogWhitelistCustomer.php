@@ -69,14 +69,6 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
         $fields = parent::getCMSFields();
         $fields->replaceField(
             'BasedOnID',
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD: LinkField (case sensitive)
-             * NEW: LinkField (COMPLEX)
-             * EXP: You may need to run the following class: https://github.com/sunnysideup/silverstripe-migration-task/blob/master/src/Tasks/FixSheaDawsonLink.php
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
             CMSEditLinkField::create(
                 'BasedOnID',
                 _t('OrderStatusLogWhitelistCustomer.BASED_ON', 'Based on'),
@@ -85,14 +77,6 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
         );
         $fields->replaceField(
             'MemberID',
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD: LinkField (case sensitive)
-             * NEW: LinkField (COMPLEX)
-             * EXP: You may need to run the following class: https://github.com/sunnysideup/silverstripe-migration-task/blob/master/src/Tasks/FixSheaDawsonLink.php
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
             CMSEditLinkField::create(
                 'MemberID',
                 _t('OrderStatusLogWhitelistCustomer.CUSTOMER', 'Customer'),
