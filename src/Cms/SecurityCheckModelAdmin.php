@@ -2,7 +2,8 @@
 
 namespace Sunnysideup\EcommerceSecurity\Cms;
 
-use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
+use SilverStripe\Admin\ModelAdmin;
+use Sunnysideup\Ecommerce\Cms\EcommerceModelAdminTrait;
 
 /**
  * @description: CMS management for everything you have sold and all related data (e.g. logs, payments)
@@ -12,8 +13,9 @@ use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
  * @sub-package: cms
  * @inspiration: Silverstripe Ltd, Jeremy
  **/
-class SecurityCheckModelAdmin extends ModelAdminEcommerceBaseClass
+class SecurityCheckModelAdmin extends ModelAdmin
 {
+    use EcommerceModelAdminTrait;
     /**
      * Change this variable if you don't want the Import from CSV form to appear.
      * This variable can be a boolean or an array.
@@ -48,5 +50,5 @@ class SecurityCheckModelAdmin extends ModelAdminEcommerceBaseClass
      * @var string
      */
     private static $menu_icon = 'vendor/sunnysideup/ecommerce/client/images/icons/money-file.gif';
-    
+
 }
