@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
-use GeoIP;
+use Sunnysideup\Geoip\Geoip;
 
 
 
@@ -171,7 +171,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             }
             if ($securityIP) {
                 $country = '';
-                if (class_exists('GeoIP')) {
+                if (class_exists(Geoip::class)) {
                     $country = GeoIP::ip2country($securityIP)['name'];
                 }
                 $fields->addFieldToTab(
