@@ -88,7 +88,7 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
 
     /**
      * @param  Member  $member  the member to check
-     * @return boolean          returns true of the member is a security risk
+     * @return bool          returns true of the member is a security risk
      */
     public static function member_is_security_risk(Member $member)
     {
@@ -97,7 +97,7 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
 
     /**
      * @param  Member  $member  the member to check
-     * @return boolean          returns true of the member has been whitelisted before
+     * @return bool          returns true of the member has been whitelisted before
      */
     public static function member_is_whitelisted(Member $member)
     {
