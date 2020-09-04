@@ -29,6 +29,7 @@ use Sunnysideup\Ecommerce\Model\Address\ShippingAddress;
 use Sunnysideup\Ecommerce\Model\Money\EcommercePayment;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
+use Sunnysideup\Ecommerce\Api\EcommerceCountryVisitorCountryProvider;
 use Sunnysideup\EcommerceSecurity\Interfaces\EcommerceSecurityLogInterface;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityAddress;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass;
@@ -36,7 +37,6 @@ use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityIP;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityPhone;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityProxyIP;
-use Sunnysideup\Geoip\Geoip;
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
@@ -170,10 +170,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 }
             }
             if ($securityIP) {
-                $country = '';
-                if (class_exists(Geoip::class)) {
-                    $country = GeoIP::ip2country($securityIP)['name'];
-                }
+                $country = EcommerceCountryVisitorCountryProvider::ip2country($securityIP);
                 $fields->addFieldToTab(
                     'Root.Main',
                     HeaderField::create(
