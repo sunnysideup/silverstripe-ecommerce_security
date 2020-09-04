@@ -2,8 +2,6 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Records;
 
-use SilverStripe\Control\Email\Email;
-
 class EcommerceSecurityEmail extends EcommerceSecurityBaseClass
 {
     /**

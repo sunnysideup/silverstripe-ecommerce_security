@@ -16,6 +16,7 @@ use Sunnysideup\Ecommerce\Cms\EcommerceModelAdminTrait;
 class SecurityCheckModelAdmin extends ModelAdmin
 {
     use EcommerceModelAdminTrait;
+
     /**
      * Change this variable if you don't want the Import from CSV form to appear.
      * This variable can be a boolean or an array.
@@ -50,5 +51,4 @@ class SecurityCheckModelAdmin extends ModelAdmin
      * @var string
      */
     private static $menu_icon = 'vendor/sunnysideup/ecommerce/client/images/icons/money-file.gif';
-
 }

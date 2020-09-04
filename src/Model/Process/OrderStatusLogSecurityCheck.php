@@ -2,20 +2,19 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
-use Sunnysideup\Geoip\Geoip;
-
-
-
-
-
-
-
-
-
-
-
-
 use SilverStripe\Control\Email\Email;
+
+
+
+
+
+
+
+
+
+
+
+
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\GridField\GridField;
@@ -37,6 +36,7 @@ use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityIP;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityPhone;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityProxyIP;
+use Sunnysideup\Geoip\Geoip;
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
@@ -640,7 +640,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 foreach ($fields as $tempOrder) {
                     break;
                 }
-                if($tempOrder){
+                if ($tempOrder) {
                     $html .= '
                     <li><a href="' . $tempOrder->CMSEditLink() . '">' . $tempOrder->getTitle() . '</a>: with same ' . implode(', and with same ', array_keys($fields)) . '</li>';
                 }
