@@ -634,7 +634,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             $html .= '
                 <h4>Similar orders in the last ' . $days . ' days</h4>
                 <ul class="SecurityCheckListOfRisks otherRisks">';
-            foreach ($similarArray as $orderID => $fields) {
+            foreach ($similarArray as $fields) {
                 $tempOrder = null;
                 //we just loop this so we can get the order ...
                 foreach ($fields as $tempOrder) {
