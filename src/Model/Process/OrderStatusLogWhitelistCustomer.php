@@ -99,7 +99,7 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
      * @param  Member  $member  the member to check
      * @return bool          returns true of the member has been whitelisted before
      */
-    public static function member_is_whitelisted(Member $member)
+    public static function member_is_whitelisted(Member $member) : bool
     {
         if ($member->IsSecurityRisk) {
             return false;
