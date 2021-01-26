@@ -5,7 +5,6 @@ namespace Sunnysideup\EcommerceSecurity\Model\Process;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
-use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogWhitelistCustomer;
 
 class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
 {
