@@ -360,7 +360,6 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     }
 
     /**
-     * @param  Order $order
      * @return bool
      */
     public function pass()

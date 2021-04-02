@@ -87,8 +87,6 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      *
      * @see Order::doNextStatus
      *
-     * @param Order $order
-     *
      * @return OrderStep|null (next step OrderStep object)
      **/
     public function nextStep(Order $order)
