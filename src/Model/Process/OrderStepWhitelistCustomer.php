@@ -94,7 +94,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
         return null;
     }
 
-    public function HideFromEveryone()
+    public function HideFromEveryone() : bool
     {
         return true;
     }
