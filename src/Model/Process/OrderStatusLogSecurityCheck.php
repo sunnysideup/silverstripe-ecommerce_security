@@ -3,18 +3,6 @@
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
 use SilverStripe\Control\Email\Email;
-
-
-
-
-
-
-
-
-
-
-
-
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\GridField\GridField;
@@ -24,6 +12,8 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBField;
+
+use SilverStripe\Security\Member;
 use Sunnysideup\Ecommerce\Api\EcommerceCountryVisitorCountryProvider;
 use Sunnysideup\Ecommerce\Model\Address\BillingAddress;
 use Sunnysideup\Ecommerce\Model\Address\ShippingAddress;
@@ -684,6 +674,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 return $member;
             }
         }
+        return null;
     }
 
     protected function blacklistCheck($arrayOfValues, $securityClass)

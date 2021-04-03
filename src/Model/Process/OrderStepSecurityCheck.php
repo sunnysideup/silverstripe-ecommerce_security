@@ -35,8 +35,6 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
         'HideStepFromCustomer' => 1,
     ];
 
-    private static $_passed = null;
-
     private static $_my_order = null;
 
     public function getCMSFields()
@@ -83,13 +81,11 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      **/
     public function doStep(Order $order)
     {
-        if (self::$_passed !== null) {
-            return self::$_passed;
+        $entry = $this->RelevantLogEntry($order);
+        if ($entry) {
+            return $entry->pass();
         }
-        if ($entry = $this->RelevantLogEntry($order)) {
-            self::$_passed = $entry->pass();
-            return self::$_passed;
-        }
+        return false;
     }
 
     /**
