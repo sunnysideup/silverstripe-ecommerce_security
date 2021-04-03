@@ -6,13 +6,13 @@ class EcommerceSecurityIP extends EcommerceSecurityBaseClass
 {
     /**
      * standard SS variable
-     * @var String
+     * @var string
      */
     private static $singular_name = 'Blacklisted IP Address';
 
     /**
      * standard SS variable
-     * @var String
+     * @var string
      */
     private static $plural_name = 'Blacklisted IP Addresses';
 
