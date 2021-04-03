@@ -95,7 +95,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
             return parent::nextStep($order);
         }
 
-        return;
+        return null;
     }
 
     public function HideFromEveryone()

@@ -101,8 +101,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
         if ($this->doStep($order)) {
             return parent::nextStep($order);
         }
-
-        return;
+        return null;
     }
 
     /**
