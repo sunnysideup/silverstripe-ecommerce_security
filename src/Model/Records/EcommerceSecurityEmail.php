@@ -6,13 +6,13 @@ class EcommerceSecurityEmail extends EcommerceSecurityBaseClass
 {
     /**
      * standard SS variable
-     * @Var String
+     * @var String
      */
     private static $singular_name = 'Blacklisted Email';
 
     /**
      * standard SS variable
-     * @Var String
+     * @var String
      */
     private static $plural_name = 'Blacklisted Emails';
 

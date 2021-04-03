@@ -6,13 +6,13 @@ class EcommerceSecurityPhone extends EcommerceSecurityBaseClass
 {
     /**
      * standard SS variable
-     * @Var String
+     * @var String
      */
     private static $singular_name = 'Blacklisted Phone';
 
     /**
      * standard SS variable
-     * @Var String
+     * @var String
      */
     private static $plural_name = 'Blacklisted Phones';
 

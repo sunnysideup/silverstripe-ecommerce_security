@@ -16,13 +16,13 @@ class EcommerceSecurityBaseClass extends DataObject
 {
     /**
      * standard SS variable
-     * @Var String
+     * @var String
      */
     private static $singular_name = 'Blacklisted Item';
 
     /**
      * standard SS variable
-     * @Var String
+     * @var String
      */
     private static $plural_name = 'Blacklisted Items';
 
