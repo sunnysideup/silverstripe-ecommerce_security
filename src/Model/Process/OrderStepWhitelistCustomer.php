@@ -89,7 +89,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      *
      * @return OrderStep|null (next step OrderStep object)
      **/
-    public function nextStep(Order $order) : bool
+    public function nextStep(Order $order)
     {
         if ($this->doStep($order)) {
             return parent::nextStep($order);
