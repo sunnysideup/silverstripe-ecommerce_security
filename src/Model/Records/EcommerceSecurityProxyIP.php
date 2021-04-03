@@ -5,13 +5,15 @@ namespace Sunnysideup\EcommerceSecurity\Model\Records;
 class EcommerceSecurityProxyIP extends EcommerceSecurityBaseClass
 {
     /**
-     * standard SS variable
+     * standard SS variable.
+     *
      * @var string
      */
     private static $singular_name = 'Blacklisted Proxy IP Address';
 
     /**
-     * standard SS variable
+     * standard SS variable.
+     *
      * @var string
      */
     private static $plural_name = 'Blacklisted Proxy IP Addresses';

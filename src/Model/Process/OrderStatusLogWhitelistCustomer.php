@@ -12,7 +12,7 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
  * @package: ecommerce
  * @sub-package: model
  * @inspiration: Silverstripe Ltd, Jeremy
- **/
+ */
 class OrderStatusLogWhitelistCustomer extends OrderStatusLog
 {
     /**
@@ -83,12 +83,14 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
                 $this->Member()
             )
         );
+
         return $fields;
     }
 
     /**
-     * @param  Member  $member  the member to check
-     * @return bool          returns true of the member is a security risk
+     * @param Member $member the member to check
+     *
+     * @return bool returns true of the member is a security risk
      */
     public static function member_is_security_risk(Member $member)
     {
@@ -96,14 +98,16 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
     }
 
     /**
-     * @param  Member  $member  the member to check
-     * @return bool          returns true of the member has been whitelisted before
+     * @param Member $member the member to check
+     *
+     * @return bool returns true of the member has been whitelisted before
      */
     public static function member_is_whitelisted(Member $member): bool
     {
         if ($member->IsSecurityRisk) {
             return false;
         }
+
         return $member->IsWhitelisted;
     }
 
@@ -160,14 +164,16 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
                                 [
                                     'ID' => $order->ID,
                                 ]
-                            );
+                            )
+                        ;
                         $count = 0;
                         $minOrdersRequired = $this->Config()->get('min_number_of_paid_orders_required');
                         foreach ($previousOrders as $previousOrder) {
                             if ($previousOrder->IsPaid() && $previousOrder->IsArchived()) {
-                                $count++;
+                                ++$count;
                                 if ($count >= $minOrdersRequired) {
                                     $this->Whitelist = true;
+
                                     break;
                                 }
                             }

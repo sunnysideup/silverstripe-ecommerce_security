@@ -12,7 +12,7 @@ use Sunnysideup\Ecommerce\Cms\EcommerceModelAdminTrait;
  * @package: ecommerce
  * @sub-package: cms
  * @inspiration: Silverstripe Ltd, Jeremy
- **/
+ */
 class SecurityCheckModelAdmin extends ModelAdmin
 {
     use EcommerceModelAdminTrait;

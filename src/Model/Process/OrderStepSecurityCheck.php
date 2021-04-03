@@ -13,7 +13,7 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStep;
  * @package: ecommerce
  * @sub-package: model
  * @inspiration: Silverstripe Ltd, Jeremy
- **/
+ */
 class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
 {
     /**
@@ -50,7 +50,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      * @see Order::doNextStatus
      *
      * @return bool - true if the current step is ready to be run...
-     **/
+     */
     public function initStep(Order $order): bool
     {
         $logCount = $this->RelevantLogEntries($order)->count();
@@ -62,6 +62,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
             $object->OrderID = $order->ID;
             $object->write();
         }
+
         return true;
     }
 
@@ -73,14 +74,15 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *
      * @see Order::doNextStatus
      *
-     * @return bool - true if run correctly.
-     **/
+     * @return bool - true if run correctly
+     */
     public function doStep(Order $order): bool
     {
         $entry = $this->RelevantLogEntry($order);
         if ($entry) {
             return $entry->pass();
         }
+
         return false;
     }
 
@@ -90,13 +92,14 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *
      * @see Order::doNextStatus
      *
-     * @return OrderStep|null (next step OrderStep object)
-     **/
+     * @return null|OrderStep (next step OrderStep object)
+     */
     public function nextStep(Order $order)
     {
         if ($this->doStep($order)) {
             return parent::nextStep($order);
         }
+
         return null;
     }
 
@@ -104,7 +107,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      * Allows the opportunity for the Order Step to add any fields to Order::getCMSFields.
      *
      * @return FieldList
-     **/
+     */
     public function addOrderStepFields(FieldList $fields, Order $order)
     {
         $fields = parent::addOrderStepFields($fields, $order);
@@ -126,7 +129,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      * For some ordersteps this returns true...
      *
      * @return bool
-     **/
+     */
     protected function hasCustomerMessage()
     {
         return false;

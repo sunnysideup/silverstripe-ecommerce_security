@@ -12,7 +12,6 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBField;
-
 use SilverStripe\Security\Member;
 use Sunnysideup\Ecommerce\Api\EcommerceCountryVisitorCountryProvider;
 use Sunnysideup\Ecommerce\Model\Address\BillingAddress;
@@ -33,7 +32,7 @@ use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityProxyIP;
  * @package: ecommerce
  * @sub-package: model
  * @inspiration: Silverstripe Ltd, Jeremy
- **/
+ */
 class OrderStatusLogSecurityCheck extends OrderStatusLog
 {
     protected $warningMessages = [];
@@ -76,7 +75,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
      *              "Title" => "Address Exists",
      *              "MinSubTotal" => 50,
      *              "Explanation" => "Check Payment system for $$$ coming in"
-     *          )
+     *          ).
      *
      * @var array
      */
@@ -110,9 +109,9 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     /**
      * caching variable only...
      *
-     * @var bool|null
+     * @var null|bool
      */
-    private $_memberIsWhitelisted = null;
+    private $_memberIsWhitelisted;
 
     public function i18n_singular_name()
     {
@@ -134,16 +133,19 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         $order = $this->Order();
         if ($order && $order->exists()) {
             $status = $order->MyStep();
-            if ($status && $status->Code === 'SECURITY_CHECK') {
+            if ($status && 'SECURITY_CHECK' === $status->Code) {
                 return parent::canEdit($member);
             }
+
             return false;
         }
+
         return parent::canEdit($member);
     }
 
     /**
-     * CMS Fields
+     * CMS Fields.
+     *
      * @return \SilverStripe\Forms\FieldList
      */
     public function getCMSFields()
@@ -156,6 +158,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             foreach ($this->BlacklistItems() as $item) {
                 if (is_a($item, EcommerceSecurityIP::class)) {
                     $securityIP = $item->Title;
+
                     break;
                 }
             }
@@ -218,7 +221,8 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     )
                     ->exclude(
                         ['ID' => $order->ID]
-                    );
+                    )
+                ;
                 if ($previousOrders->count()) {
                     $fields->addFieldToTab(
                         'Root.PreviousOrders',
@@ -240,7 +244,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             }
         }
         $allFields = [];
-        for ($i = 1; $i < 13; $i++) {
+        for ($i = 1; $i < 13; ++$i) {
             $allFields['Check' . $i] = 'Check' . $i;
         }
         $checks = $this->Config()->get('checks_required');
@@ -341,6 +345,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         $fields->removeFieldFromTab('Root.Main', 'InternalUseOnly');
         $fields->makeFieldReadonly('Risks');
         $fields->makeFieldReadonly('SubTotal');
+
         return $fields;
     }
 
@@ -366,12 +371,13 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     user_error('bad field  ....');
                 }
                 // there is a check that needs to be TRUE, but is not ...
-                if ($this->{$fieldName} === 'Done' || $this->{$fieldName} === 'Whitelisted Customer') {
+                if ('Done' === $this->{$fieldName} || 'Whitelisted Customer' === $this->{$fieldName}) {
                 } else {
                     return false;
                 }
             }
         }
+
         return true;
     }
 
@@ -380,7 +386,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         parent::onAfterWrite();
         $order = $this->Order();
         if (self::$_saved_already < 3) {
-            self::$_saved_already++;
+            ++self::$_saved_already;
             if ($order && $order->exists()) {
                 $this->SubTotal = $order->getSubTotal();
                 $this->Risks = $this->collateRisks();
@@ -391,7 +397,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 $this->write();
             }
             if ($this->memberIsWhitelisted()) {
-                for ($i = 1; $i < 13; $i++) {
+                for ($i = 1; $i < 13; ++$i) {
                     $field = 'Check' . $i;
                     $this->{$field} = 'Whitelisted Customer';
                 }
@@ -452,7 +458,8 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     $timeFilter
                 )
             )
-            ->exclude(['ID' => $order->ID]);
+            ->exclude(['ID' => $order->ID])
+        ;
         foreach ($otherOrders as $otherOrder) {
             if (! isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = [];
@@ -549,7 +556,8 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             ->filter(
                 ['ShippingAddress' => $addressArray] + $timeFilter
             )
-            ->exclude(['OrderID' => $order->ID]);
+            ->exclude(['OrderID' => $order->ID])
+        ;
         foreach ($otherShippingAddresses as $address) {
             $otherOrder = $address->Order();
             if ($otherOrder && $otherOrder->ID !== $order->ID) {
@@ -641,29 +649,32 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     }
 
     /**
-     * @param  EcommerceSecurityBaseClass $obj
-     * @return bool                             return true if the status of the object is `Bad`
+     * @param EcommerceSecurityBaseClass $obj
+     *
+     * @return bool return true if the status of the object is `Bad`
      */
     protected function checkSecurityObject($obj)
     {
-        if ($obj->Status === 'Bad') {
+        if ('Bad' === $obj->Status) {
             return false;
         }
+
         return true;
     }
 
     protected function memberIsWhitelisted()
     {
-        if ($this->_memberIsWhitelisted === null) {
+        if (null === $this->_memberIsWhitelisted) {
             if ($member = $this->orderMember()) {
                 $this->_memberIsWhitelisted = OrderStatusLogWhitelistCustomer::member_is_whitelisted($member);
             }
         }
+
         return $this->_memberIsWhitelisted;
     }
 
     /**
-     * @return \SilverStripe\Security\Member|null
+     * @return null|\SilverStripe\Security\Member
      */
     protected function orderMember()
     {
@@ -674,6 +685,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 return $member;
             }
         }
+
         return null;
     }
 

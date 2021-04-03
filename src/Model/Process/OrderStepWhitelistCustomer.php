@@ -26,9 +26,9 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
     ];
 
     /**
-     * @var bool|null
+     * @var null|bool
      */
-    private $_completed = null;
+    private $_completed;
 
     public function getCMSFields()
     {
@@ -43,7 +43,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      * @see Order::doNextStatus
      *
      * @return bool - true if the current step is ready to be run...
-     **/
+     */
     public function initStep(Order $order): bool
     {
         return true;
@@ -57,11 +57,11 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      *
      * @see Order::doNextStatus
      *
-     * @return bool - true if run correctly.
-     **/
+     * @return bool - true if run correctly
+     */
     public function doStep(Order $order): bool
     {
-        if ($this->_completed !== null) {
+        if (null !== $this->_completed) {
             return $this->_completed;
         }
         $entry = $this->RelevantLogEntry($order);
@@ -83,8 +83,8 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      *
      * @see Order::doNextStatus
      *
-     * @return OrderStep|null (next step OrderStep object)
-     **/
+     * @return null|OrderStep (next step OrderStep object)
+     */
     public function nextStep(Order $order)
     {
         if ($this->doStep($order)) {
@@ -103,7 +103,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      * For some ordersteps this returns true...
      *
      * @return bool
-     **/
+     */
     protected function hasCustomerMessage()
     {
         return false;

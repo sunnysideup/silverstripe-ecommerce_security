@@ -5,13 +5,15 @@ namespace Sunnysideup\EcommerceSecurity\Model\Records;
 class EcommerceSecurityAddress extends EcommerceSecurityBaseClass
 {
     /**
-     * standard SS variable
+     * standard SS variable.
+     *
      * @var string
      */
     private static $singular_name = 'Blacklisted Address';
 
     /**
-     * standard SS variable
+     * standard SS variable.
+     *
      * @var string
      */
     private static $plural_name = 'Blacklisted Addresses';

@@ -15,13 +15,15 @@ use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
 class EcommerceSecurityBaseClass extends DataObject
 {
     /**
-     * standard SS variable
+     * standard SS variable.
+     *
      * @var string
      */
     private static $singular_name = 'Blacklisted Item';
 
     /**
-     * standard SS variable
+     * standard SS variable.
+     *
      * @var string
      */
     private static $plural_name = 'Blacklisted Items';
@@ -89,10 +91,12 @@ class EcommerceSecurityBaseClass extends DataObject
      * ```php
      *     array('Title' => 'Foo')
      * ```
-     * you can not provide multi-dimensional arrays
+     * you can not provide multi-dimensional arrays.
      *
-     * @param  array $write  associative array of filter values
-     * @param  bool $write   if a new one is created, should it be written
+     * @param array $write       associative array of filter values
+     * @param bool  $write       if a new one is created, should it be written
+     * @param mixed $filterArray
+     *
      * @return DataObject
      */
     public static function find_or_create($filterArray, $write = true)
@@ -126,7 +130,7 @@ class EcommerceSecurityBaseClass extends DataObject
             $member = Security::getCurrentUser();
         }
         $extended = $this->extendedCan(__FUNCTION__, $member);
-        if ($extended !== null) {
+        if (null !== $extended) {
             return $extended;
         }
         if (Permission::checkMember($member, Config::inst()->get(EcommerceRole::class, 'admin_permission_code'))) {
@@ -142,7 +146,7 @@ class EcommerceSecurityBaseClass extends DataObject
             $member = Security::getCurrentUser();
         }
         $extended = $this->extendedCan(__FUNCTION__, $member);
-        if ($extended !== null) {
+        if (null !== $extended) {
             return $extended;
         }
         if (Permission::checkMember($member, Config::inst()->get(EcommerceRole::class, 'admin_permission_code'))) {
@@ -158,7 +162,8 @@ class EcommerceSecurityBaseClass extends DataObject
     }
 
     /**
-     * CMS Fields
+     * CMS Fields.
+     *
      * @return \SilverStripe\Forms\FieldList
      */
     public function getCMSFields()
@@ -189,6 +194,7 @@ class EcommerceSecurityBaseClass extends DataObject
             );
             $fields->dataFieldByName('Title')->setTitle('Value');
         }
+
         return $fields;
     }
 
@@ -207,7 +213,7 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     public function hasRisks()
     {
-        return $this->Title && $this->ID && $this->Status === 'Bad' ? true : false;
+        return $this->Title && $this->ID && 'Bad' === $this->Status ? true : false;
     }
 
     /**
@@ -215,7 +221,7 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     public function isSafe()
     {
-        return $this->Status === 'Good' ? true : false;
+        return 'Good' === $this->Status ? true : false;
     }
 
     /**
@@ -223,7 +229,7 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     public function hasOpinion()
     {
-        return $this->Status !== 'Unknown' ? true : false;
+        return 'Unknown' !== $this->Status ? true : false;
     }
 
     public function requireDefaultRecords()
