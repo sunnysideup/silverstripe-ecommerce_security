@@ -26,7 +26,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
     ];
 
     /**
-     * @var null|bool
+     * @var bool
      */
     private $_completed;
 

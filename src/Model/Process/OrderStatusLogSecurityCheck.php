@@ -109,7 +109,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     /**
      * caching variable only...
      *
-     * @var null|bool
+     * @var bool
      */
     private $_memberIsWhitelisted;
 
