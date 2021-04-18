@@ -3,7 +3,7 @@
 namespace Sunnysideup\EcommerceSecurity\Cms;
 
 use SilverStripe\Admin\ModelAdmin;
-use Sunnysideup\Ecommerce\Cms\EcommerceModelAdminTrait;
+use Sunnysideup\Ecommerce\Traits\EcommerceModelAdminTrait;
 
 /**
  * @description: CMS management for everything you have sold and all related data (e.g. logs, payments)
