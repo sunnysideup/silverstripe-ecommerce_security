@@ -223,7 +223,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                         ['ID' => $order->ID]
                     )
                 ;
-                if ($previousOrders->count()) {
+                if ($previousOrders->exists()) {
                     $fields->addFieldToTab(
                         'Root.PreviousOrders',
                         new GridField(
