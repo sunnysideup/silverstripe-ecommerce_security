@@ -21,7 +21,7 @@ class EcommerceSecurityOrderDecoration extends DataExtension
         if ($this->owner->IsSubmitted()) {
             $currentStep = $this->owner->MyStep()->Sort;
             $securityStep = OrderStep::get()->filter(['ClassName' => OrderStepSecurityCheck::class])->first()->Sort;
-            if (! $this->owner->IsPaid() && $currentStep < $securityStep) {
+            if ($currentStep < $securityStep) {
                 $fields->addFieldsToTab(
                     'Root.Next',
                     [
