@@ -35,7 +35,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
         'HideStepFromCustomer' => 1,
     ];
 
-    private static $_my_order = null;
+    private static $_my_order;
 
     public function getCMSFields()
     {
