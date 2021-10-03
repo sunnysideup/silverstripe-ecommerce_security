@@ -23,15 +23,11 @@ class EcommerceSecurityOrderDecoration extends DataExtension
             $securityStep = OrderStep::get()->filter(['ClassName' => OrderStepSecurityCheck::class])->first()->Sort;
             if ($currentStep < $securityStep) {
                 $fields->addFieldsToTab(
-                    'Root.Next',
+                    'Root.Process',
                     [
-                        HeaderField::create(
-                            'SkipToSecurityChecksHeader',
-                            'Skip To Security Checks'
-                        ),
                         CheckboxField::create(
                             'SkipToSecurityChecks',
-                            'Skip To Security Checks'
+                            'Lets Skip To Security Checks'
                         )->setDescription(
                             'Ticking this checkbox will skip the payment step, allowing security checks to be conducted for orders that do not have successful payments.'
                         ),
