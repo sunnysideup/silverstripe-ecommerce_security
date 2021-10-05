@@ -108,7 +108,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *
      * @return FieldList
      */
-    public function addOrderStepFields(FieldList $fields, Order $order)
+    public function addOrderStepFields(FieldList $fields, Order $order, ?bool $nothingToDo = false)
     {
         $fields = parent::addOrderStepFields($fields, $order);
         $title = _t('OrderStep.MUST_ACTION_SECURITY_CHECKS', ' ... To move this order to the next step you have to carry out a bunch of security checks.');
