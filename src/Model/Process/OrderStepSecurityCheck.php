@@ -113,14 +113,12 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
         $fields = parent::addOrderStepFields($fields, $order);
         $title = _t('OrderStep.MUST_ACTION_SECURITY_CHECKS', ' ... To move this order to the next step you have to carry out a bunch of security checks.');
         $field = $order->getOrderStatusLogsTableFieldEditable(OrderStatusLogSecurityCheck::class, $title);
-        $logEntry = $this->RelevantLogEntry($order);
-        $link = '/admin/sales/Sunnysideup-Ecommerce-Model-Order/EditForm/field/Sunnysideup-Ecommerce-Model-Order/item/' . $order->ID . '/ItemEditForm/field/OrderStatusLog/item/' . $logEntry->ID . '/edit';
-        $button = EcommerceCMSButtonField::create(
-            'OrderStatusLogSecurityCheck_Button',
-            $link,
-            'Open Security Checks'
+        $fields->addFieldsToTab(
+            'Root.Next',
+            [
+                $field
+            ]
         );
-        $fields->addFieldsToTab('Root.Next', [$button, $field], 'ActionNextStepManually');
 
         return $fields;
     }
