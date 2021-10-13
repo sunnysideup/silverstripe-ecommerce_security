@@ -18,8 +18,8 @@ class EcommerceSecurityOrderDecoration extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
-        if ($this->owner->IsSubmitted()) {
-            $currentStep = $this->owner->MyStep()->Sort;
+        if ($this->getOwner()->IsSubmitted()) {
+            $currentStep = $this->getOwner()->MyStep()->Sort;
             $securityStep = OrderStep::get()->filter(['ClassName' => OrderStepSecurityCheck::class])->first()->Sort;
             if ($currentStep < $securityStep) {
                 $fields->addFieldsToTab(
@@ -44,17 +44,17 @@ class EcommerceSecurityOrderDecoration extends DataExtension
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if ($this->owner->SkipToSecurityChecks) {
-            $logCount = OrderStatusLogSecurityCheck::get()->filter(['OrderID' => $this->owner->ID])->count();
+        if ($this->getOwner()->SkipToSecurityChecks) {
+            $logCount = OrderStatusLogSecurityCheck::get()->filter(['OrderID' => $this->getOwner()->ID])->count();
             if ($logCount) {
                 //do nothing - the security check already exists
             } else {
                 $securityCheck = OrderStatusLogSecurityCheck::create();
-                $securityCheck->OrderID = $this->owner->ID;
+                $securityCheck->OrderID = $this->getOwner()->ID;
                 $securityCheck->write();
                 $securityStepID = OrderStep::get()->filter(['ClassName' => OrderStepSecurityCheck::class])->first()->ID;
                 if ($securityStepID) {
-                    $this->owner->StatusID = $securityStepID;
+                    $this->getOwner()->StatusID = $securityStepID;
                 }
             }
         }
