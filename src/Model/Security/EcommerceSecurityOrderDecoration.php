@@ -31,8 +31,7 @@ class EcommerceSecurityOrderDecoration extends DataExtension
                         )->setDescription(
                             'Ticking this checkbox will skip the payment step, allowing security checks to be conducted for orders that do not have successful payments.'
                         ),
-                    ],
-                    'ActionNextStepManually'
+                    ]
                 );
             }
         }
