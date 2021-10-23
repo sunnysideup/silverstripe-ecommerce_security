@@ -53,10 +53,8 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      */
     public function initStep(Order $order): bool
     {
-        $logCount = $this->RelevantLogEntries($order)->count();
-        if ($logCount) {
-            //do nothing
-        } else {
+        $logsExist = $this->RelevantLogEntries($order)->exists();
+        if (! $logsExist) {
             $className = $this->relevantLogEntryClassName;
             $object = $className::create();
             $object->OrderID = $order->ID;
