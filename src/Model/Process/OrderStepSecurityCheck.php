@@ -3,7 +3,6 @@
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
 use SilverStripe\Forms\FieldList;
-use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
@@ -114,7 +113,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
         $fields->addFieldsToTab(
             'Root.Next',
             [
-                $field
+                $field,
             ]
         );
 

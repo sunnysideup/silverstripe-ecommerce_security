@@ -4,7 +4,6 @@ namespace Sunnysideup\EcommerceSecurity\Model\Security;
 
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\HeaderField;
 use SilverStripe\ORM\DataExtension;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
@@ -45,7 +44,7 @@ class EcommerceSecurityOrderDecoration extends DataExtension
         parent::onBeforeWrite();
         if ($this->getOwner()->SkipToSecurityChecks) {
             $logExists = OrderStatusLogSecurityCheck::get()->filter(['OrderID' => $this->getOwner()->ID])->exists();
-            if (!$logExists) {
+            if (! $logExists) {
                 $securityCheck = OrderStatusLogSecurityCheck::create();
                 $securityCheck->OrderID = $this->getOwner()->ID;
                 $securityCheck->write();
