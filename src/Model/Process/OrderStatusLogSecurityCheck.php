@@ -412,7 +412,8 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             if ($order && $order->exists()) {
                 $order->Archive(true);
             }
-            if ($member = $this->orderMember()) {
+            $member = $this->orderMember();
+            if ($member) {
                 $member->IsWhitelisted = false;
                 $member->IsSecurityRisk = true;
                 $member->write();
@@ -665,7 +666,8 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     protected function memberIsWhitelisted()
     {
         if (null === $this->_memberIsWhitelisted) {
-            if ($member = $this->orderMember()) {
+            $member = $this->orderMember();
+            if ($member) {
                 $this->_memberIsWhitelisted = OrderStatusLogWhitelistCustomer::member_is_whitelisted($member);
             }
         }
