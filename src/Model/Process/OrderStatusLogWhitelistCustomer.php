@@ -131,7 +131,7 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
         if ($this->Whitelist) {
             return true;
         }
-        $order = $this->Order();
+        $order = $this->getOrderCached();
         if ($order && $order->exists()) {
             if ($order->MemberID) {
                 $this->MemberID = $order->MemberID;

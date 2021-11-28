@@ -130,7 +130,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
 
     public function canEdit($member = null, $context = [])
     {
-        $order = $this->Order();
+        $order = $this->getOrderCached();
         if ($order && $order->exists()) {
             $status = $order->MyStep();
             if ($status && 'SECURITY_CHECK' === $status->Code) {
@@ -151,7 +151,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $order = $this->Order();
+        $order = $this->getOrderCached();
         if ($order) {
             $member = $this->orderMember();
             $securityIP = '';
@@ -359,7 +359,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
      */
     public function pass()
     {
-        $order = $this->Order();
+        $order = $this->getOrderCached();
         if (! $order) {
             return false;
         }
@@ -384,7 +384,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-        $order = $this->Order();
+        $order = $this->getOrderCached();
         if (self::$_saved_already < 3) {
             ++self::$_saved_already;
             if ($order && $order->exists()) {
@@ -423,7 +423,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
 
     protected function collateRisks()
     {
-        $order = $this->Order();
+        $order = $this->getOrderCached();
         $billingAddress = $order->BillingAddress();
         $shippingAddress = $order->ShippingAddress();
         $member = $this->orderMember();
@@ -479,7 +479,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             ['Email' => $emailArray] + $timeFilter
         )->exclude(['OrderID' => $order->ID]);
         foreach ($otherBillingAddresses as $address) {
-            $otherOrder = $address->Order();
+            $otherOrder = $address->getOrderCached();
             if (! isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = [];
             }
@@ -505,7 +505,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             ['Phone' => $phoneArray] + $timeFilter
         )->exclude(['OrderID' => $order->ID]);
         foreach ($otherBillingAddresses as $address) {
-            $otherOrder = $address->Order();
+            $otherOrder = $address->getOrderCached();
             if ($otherOrder && $otherOrder->ID !== $order->ID) {
                 if (! isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = [];
@@ -517,7 +517,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             ['ShippingPhone' => $phoneArray] + $timeFilter
         )->exclude(['OrderID' => $order->ID]);
         foreach ($otherShippingAddresses as $address) {
-            $otherOrder = $address->Order();
+            $otherOrder = $address->getOrderCached();
             if ($otherOrder && $otherOrder->ID !== $order->ID) {
                 if (! isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = [];
@@ -545,7 +545,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             ['Address' => $addressArray] + $timeFilter
         )->exclude(['OrderID' => $order->ID]);
         foreach ($otherBillingAddresses as $address) {
-            $otherOrder = $address->Order();
+            $otherOrder = $address->getOrderCached();
             if ($otherOrder && $otherOrder->ID !== $order->ID) {
                 if (! isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = [];
@@ -560,7 +560,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             ->exclude(['OrderID' => $order->ID])
         ;
         foreach ($otherShippingAddresses as $address) {
-            $otherOrder = $address->Order();
+            $otherOrder = $address->getOrderCached();
             if ($otherOrder && $otherOrder->ID !== $order->ID) {
                 if (! isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = [];
@@ -589,7 +589,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 ['IP' => $ipArray] + $timeFilter
             )->exclude(['OrderID' => $order->ID]);
             foreach ($otherPayments as $payment) {
-                $otherOrder = $payment->Order();
+                $otherOrder = $payment->getOrderCached();
                 if (! isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = [];
                 }
@@ -603,7 +603,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 ['ProxyIP' => $ipProxyArray] + $timeFilter
             )->exclude(['OrderID' => $order->ID]);
             foreach ($otherPayments as $payment) {
-                $otherOrder = $payment->Order();
+                $otherOrder = $payment->getOrderCached();
                 if (! isset($similarArray[$otherOrder->ID])) {
                     $similarArray[$otherOrder->ID] = [];
                 }
@@ -680,7 +680,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
      */
     protected function orderMember()
     {
-        $order = $this->Order();
+        $order = $this->getOrderCached();
         if ($order && $order->exists()) {
             $member = $order->Member();
             if ($member && $member->exists()) {
