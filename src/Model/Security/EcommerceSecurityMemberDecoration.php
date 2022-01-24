@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Security;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
 
@@ -30,5 +31,18 @@ class EcommerceSecurityMemberDecoration extends DataExtension
             }
             $securityCheck->write();
         }
+    }
+
+    public function updateCMSFields(FieldList $fields)
+    {
+        $owner = $this->getOwner();
+        $fields->addFieldsToTab(
+            'Root.Security',
+            [
+                $fields->dataFieldByName('IsWhitelisted'),
+                $fields->dataFieldByName('IsSecurityRisk'),
+            ]
+        );
+        return $fields;
     }
 }
