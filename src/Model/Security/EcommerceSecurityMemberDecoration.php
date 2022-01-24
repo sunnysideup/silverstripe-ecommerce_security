@@ -43,6 +43,7 @@ class EcommerceSecurityMemberDecoration extends DataExtension
                 $fields->dataFieldByName('IsSecurityRisk'),
             ]
         );
+
         return $fields;
     }
 }
