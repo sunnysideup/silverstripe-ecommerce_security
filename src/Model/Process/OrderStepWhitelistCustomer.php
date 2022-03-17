@@ -61,9 +61,6 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      */
     public function doStep(Order $order): bool
     {
-        if (null !== $this->_completed) {
-            return $this->_completed;
-        }
         $entry = $this->RelevantLogEntry($order);
         if (! $entry) {
             $className = $this->relevantLogEntryClassName;
@@ -72,26 +69,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
             $entry->write();
         }
         $entry->assessCustomer();
-        $this->_completed = true;
-
-        return $this->_completed;
-    }
-
-    /**
-     *nextStep:
-     * returns the next step (after it checks if everything is in place for the next step to run...).
-     *
-     * @see Order::doNextStatus
-     *
-     * @return null|OrderStep (next step OrderStep object)
-     */
-    public function nextStep(Order $order)
-    {
-        if ($this->doStep($order)) {
-            return parent::nextStep($order);
-        }
-
-        return null;
+        return true;
     }
 
     public function HideFromEveryone(): bool

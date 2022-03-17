@@ -24,6 +24,20 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
 
     private static $table_name = 'OrderStepSecurityCheck';
 
+    /**
+     * ```php
+     *     [
+     *         'MethodToReturnTrue' => StepClassName
+     *     ]
+     * ```
+     * MethodToReturnTrue must have an $order as a parameter and bool as the return value
+     * e.g. MyMethod(Order $order) : bool;
+     * @var array
+     */
+    private static $step_logic_conditions = [
+        'PassSecurityCheck' => true,
+    ];
+
     private static $defaults = [
         'CustomerCanEdit' => 0,
         'CustomerCanCancel' => 0,
@@ -75,29 +89,16 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      */
     public function doStep(Order $order): bool
     {
-        $entry = $this->RelevantLogEntry($order);
-        if ($entry) {
-            return $entry->pass();
-        }
-
-        return false;
+        return true;
     }
 
-    /**
-     *nextStep:
-     * returns the next step (after it checks if everything is in place for the next step to run...).
-     *
-     * @see Order::doNextStatus
-     *
-     * @return null|OrderStep (next step OrderStep object)
-     */
-    public function nextStep(Order $order)
+    public function PassSecurityCheck(Order $order) : bool
     {
-        if ($this->doStep($order)) {
-            return parent::nextStep($order);
+        $entry = $this->RelevantLogEntry($order);
+        if ($entry) {
+            return (bool) $entry->pass();
         }
-
-        return null;
+        return false;
     }
 
     /**
