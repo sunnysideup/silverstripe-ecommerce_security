@@ -360,7 +360,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
 
         $obj = DataObject::get_one(OrderStepSecurityCheck::class);
         if($obj) {
-            return $obj->ChecksLkist();
+            return $obj->ChecksList();
         }
         return [];
     }
@@ -388,10 +388,10 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 if(!$memberIsSecurityRisk && !empty($details['OnlyApplyToSecurityRiskCustomers'])) {
                     continue;
                 }
-                $$this->_requiredChecks[$step] = $details;
+                $this->_requiredChecks[$step] = $details;
             }
         }
-        return $$this->_requiredChecks;
+        return $this->_requiredChecks;
 
     }
 
