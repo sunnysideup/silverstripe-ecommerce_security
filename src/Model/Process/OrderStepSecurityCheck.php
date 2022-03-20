@@ -195,7 +195,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
 
                     CheckboxField::create(
                         'OnlyApplyToSecurityRiskCustomers'.$i,
-                        'OnlyApplyToSecurityRiskCustomers'
+                        'Only apply to security risk customers'
                     ),
                 ]
             );
