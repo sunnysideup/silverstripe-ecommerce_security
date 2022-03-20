@@ -241,13 +241,9 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             }
             foreach ($checks as $fieldName => $details) {
                 unset($baseList[$fieldName]);
-                $tab = 'Required';
+                $tab = 'Main';
                 if (isset($requiredChecks[$fieldName])) {
                     $hasRequiredChecks = true;
-                    $fields->addFieldToTab(
-                        'Root.Required',
-                        $myField = $fields->dataFieldByName($fieldName)
-                    );
                 } else {
                     $hasUnrequiredChecks = true;
                     $tab = 'NotRequired';
