@@ -8,6 +8,8 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\ORM\FieldType\DBBoolean;
@@ -121,6 +123,31 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         return parent::canEdit($member);
     }
 
+    public function getFrontEndFields($params = null)
+    {
+        $order = $this->getOrderCached();
+        $fields = parent::getFrontEndFields($params);
+        $fields->unshift(ReadonlyField::create('SubTotal', 'Sub-Total'));
+        $fields->unshift(ReadonlyField::create('OrderItemInfo', 'Items', $this->renderWith('Sunnysideup\\Ecommerce\\Includes\\OrderItemsTiny')));
+        $fields->unshift(ReadonlyField::create('CustomerInfo', 'Customer', $this->getOrderCached()->Member()->getCustomerDetails()));
+        $fields->unshift(ReadonlyField::create('OrderInfo', 'Order', $this->getOrderCached()->getTitle()));
+        $fields->removeByName('OrderID');
+
+        $toAdd = $this->mainFieldsFrontEndAndCMS();
+        foreach($toAdd as $field) {
+            $fields->push($field);
+        }
+
+        $toAdd = $this->requiredFieldsFrontEndAndCMS($fields);
+        foreach($toAdd as $field) {
+            $fields->push($field);
+        }
+
+        $this->fieldAdjustmentsFrontEndAndCMS($fields);
+
+        return $fields;
+    }
+
     /**
      * CMS Fields.
      *
@@ -131,65 +158,17 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         $fields = parent::getCMSFields();
         $order = $this->getOrderCached();
         if ($order) {
+            $fields->addFieldsToTab(
+                'Root.Main',
+                $this->mainFieldsFrontEndAndCMS()
+            );
+            $fields->addFieldsToTab(
+                'Root.Main',
+                $this->requiredFieldsFrontEndAndCMS($fields)
+            );
+
+            // previous orders
             $member = $this->orderMember();
-            $securityIP = '';
-            foreach ($this->BlacklistItems() as $item) {
-                if (is_a($item, EcommerceSecurityIP::class)) {
-                    $securityIP = $item->Title;
-
-                    break;
-                }
-            }
-            if ($securityIP) {
-                $country = EcommerceCountryVisitorCountryProvider::ip2country($securityIP);
-                $fields->addFieldToTab(
-                    'Root.Main',
-                    HeaderField::create(
-                        'BadHeading',
-                        'IP Address Info: '
-                    ),
-                    'Bad'
-                );
-                if ($country) {
-                    $country = '<em>Country:</em> ' . $country . '</br>';
-                }
-                $fields->addFieldToTab(
-                    'Root.Main',
-                    LiteralField::create(
-                        'IPAddressLink',
-                        $country . '<em>Detailed Info: </em><a href="https://freegeoip.net/?q=' . $securityIP . '" target="_blank">https://freegeoip.net/?q=' . $securityIP . '</a>'
-                    ),
-                    'Bad'
-                );
-            }
-
-            $fields->addFieldToTab(
-                'Root.Main',
-                HeaderField::create(
-                    'BadHeading',
-                    'Mark as Fraud'
-                ),
-                'Bad'
-            );
-
-            $fields->addFieldToTab(
-                'Root.MoreDetails',
-                HTMLEditorField::create(
-                    'Note',
-                    'Notes'
-                )
-            );
-            $fields->addFieldToTab(
-                'Root.Main',
-                HeaderField::create(
-                    'BadHeading',
-                    'Risks'
-                ),
-                'Risks'
-            );
-            $riskField = $fields->dataFieldByName('Risks');
-            $riskField->setTitle('');
-
             if ($member) {
                 $previousOrders = Order::get()
                     ->filter(
@@ -220,75 +199,8 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     );
                 }
             }
-            $fields->addFieldToTab(
-                'Root.Required',
-                HeaderField::create('RequiredChecksHeader', 'Required Checks'),
-                'Note'
-            );
-            $fields->addFieldToTab(
-                'Root.NotRequired',
-                HeaderField::create('UnrequiredChecksHeader', 'Optional Checks'),
-                'Note'
-            );
-            $hasRequiredChecks = false;
-            $hasUnrequiredChecks = false;
-            $memberIsWhitelisted = $this->memberIsWhitelisted();
-            $checks = $this->ChecksList();
-            $requiredChecks = $this->RequiredChecks($order);
-            $allFields = [];
-            for ($i = 1; $i < 13; ++$i) {
-                $baseList['Check' . $i] = 'Check' . $i;
-            }
-            foreach ($checks as $fieldName => $details) {
-                unset($baseList[$fieldName]);
-                $tab = 'Main';
-                if (isset($requiredChecks[$fieldName])) {
-                    $hasRequiredChecks = true;
-                } else {
-                    $hasUnrequiredChecks = true;
-                    $tab = 'NotRequired';
-                }
-                $fields->addFieldToTab(
-                    'Root.'.$tab,
-                    $myField = $fields->dataFieldByName($fieldName)
-                );
-                $originalOptions = $myField->getSource();
-                if (!$memberIsWhitelisted) {
-                    // can't set to whitelisted, as customer is not whitelisted
-                    unset($originalOptions['Whitelisted Customer']);
-                }
-                if (! $this->{$fieldName}) {
-                    $this->{$fieldName} = 'To do';
-                }
-                $fields->replaceField(
-                    $myField->ID(),
-                    OptionsetField::create(
-                        $myField->ID(),
-                        $details['Title'],
-                        $originalOptions
-                    )
-                );
-                if (! empty($details['Description'])) {
-                    $myField->setRightTitle($details['Description']);
-                }
-            }
-            foreach ($baseList as $fieldToRemove) {
-                $fields->removeByName($fieldToRemove);
-            }
-            if (! $hasUnrequiredChecks) {
-                $fields->addFieldToTab(
-                    'Root.NotRequired',
-                    HeaderField::create('UnrequiredChecksHeader', 'There are no optional checks for this order.'),
-                    'Note'
-                );
-            }
-            if (! $hasRequiredChecks) {
-                $fields->addFieldToTab(
-                    'Root.Required',
-                    HeaderField::create('RequiredChecksHeader', 'There are no required checks for this order.'),
-                    'Note'
-                );
-            }
+
+            // security notes
             $implementers = ClassInfo::implementorsOf(EcommerceSecurityLogInterface::class);
             if ($implementers) {
                 foreach ($implementers as $implementer) {
@@ -313,15 +225,103 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 }
             }
         }
-
-        $fields->removeFieldFromTab('Root.Main', 'AuthorID');
-        $fields->removeFieldFromTab('Root.Main', 'Title');
-        $fields->removeFieldFromTab('Root.Main', 'InternalUseOnly');
-        $fields->makeFieldReadonly('Risks');
-        $fields->makeFieldReadonly('SubTotal');
+        $fields->addFieldToTab(
+            'Root.MoreDetails',
+            HTMLEditorField::create(
+                'Note',
+                'Notes'
+            )
+        );
+        $this->fieldAdjustmentsFrontEndAndCMS($fields);
 
         return $fields;
     }
+
+
+    protected function mainFieldsFrontEndAndCMS() : array
+    {
+        $fieldArray = [];
+        $member = $this->orderMember();
+        $securityIP = '';
+        foreach ($this->BlacklistItems() as $item) {
+            if (is_a($item, EcommerceSecurityIP::class)) {
+                $securityIP = $item->Title;
+
+                break;
+            }
+        }
+        if ($securityIP) {
+            $country = EcommerceCountryVisitorCountryProvider::ip2country($securityIP);
+            if ($country) {
+                $country = '<em>Country:</em> ' . $country . '</br>';
+            }
+            $fieldArray[] =
+                LiteralField::create(
+                    'IPAddressLink',
+                    $country . '<em>Detailed Info: </em><a href="https://freegeoip.net/?q=' . $securityIP . '" target="_blank">https://freegeoip.net/?q=' . $securityIP . '</a>'
+                );
+        }
+        $fieldArray[] =
+            HeaderField::create('RequiredChecksHeader', 'Required Checks');
+
+        return $fieldArray;
+
+    }
+
+    protected function requiredFieldsFrontEndAndCMS($fields) : array
+    {
+        $fieldArray = [];
+        $order = $this->getOrderCached();
+        $memberIsWhitelisted = $this->memberIsWhitelisted();
+        $baseList = [];
+        $checks = $this->ChecksList();
+        $requiredChecks = $this->RequiredChecks($order);
+        for ($i = 1; $i < 13; ++$i) {
+            $baseList['Check' . $i] = 'Check' . $i;
+        }
+        foreach ($checks as $fieldName => $details) {
+            unset($baseList[$fieldName]);
+            if (isset($requiredChecks[$fieldName])) {
+                $hasRequiredChecks = true;
+                $myField = $fields->dataFieldByName($fieldName);
+                $originalOptions =  $fields->dataFieldByName($fieldName)->getSource();
+                if (!$memberIsWhitelisted) {
+                    // can't set to whitelisted, as customer is not whitelisted
+                    unset($originalOptions['Whitelisted Customer']);
+                }
+                if (! $this->{$fieldName}) {
+                    $this->{$fieldName} = 'To do';
+                }
+                $myField =
+                    OptionsetField::create(
+                        $myField->ID(),
+                        $details['Title'],
+                        $originalOptions
+                    );
+                if (! empty($details['Description'])) {
+                    $myField->setRightTitle($details['Description']);
+                }
+                $fieldArray[] = $myField;
+            }
+        }
+        foreach ($baseList as $fieldToRemove) {
+            $fields->removeByName($fieldToRemove);
+        }
+        return $fieldArray;
+    }
+
+    protected function fieldAdjustmentsFrontEndAndCMS($fields)
+    {
+        $fields->removeByName('AuthorID');
+        $fields->removeByName('Title');
+        $fields->removeByName('InternalUseOnly');
+        $fields->makeFieldReadonly('Risks');
+        $fields->makeFieldReadonly('SubTotal');
+        $riskField = $fields->dataFieldByName('Risks');
+        $riskField->setTitle('');
+    }
+
+
 
     public function getSecurityCleared()
     {
