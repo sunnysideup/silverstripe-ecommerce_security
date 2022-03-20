@@ -109,9 +109,10 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     {
         $order = $this->getOrderCached();
         if ($order && $order->exists()) {
-            $log = $order->MyStep();
-            if ($log && 'SECURITY_CHECK' === $log->Code) {
+            $step = $order->MyStep();
+            if ($step && 'SECURITY_CHECK' === $step->Code) {
                 return parent::canEdit($member);
+            } else {
             }
 
             return false;
@@ -272,7 +273,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     )
                 );
                 if (! empty($details['Description'])) {
-                    $myField->setRighTitle($details['Description']);
+                    $myField->setRightTitle($details['Description']);
                 }
             }
             foreach ($baseList as $fieldToRemove) {
@@ -347,7 +348,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 user_error('bad field  ....'.$fieldName);
             }
             // there is a check that needs to be TRUE, but is not ...
-            if (! ( 'Done' === $this->{$fieldName} || 'Whitelisted Customer' === $this->{$fieldName}) ) {
+            if (! ( 'Done' === $this->{$fieldName} || 'Whitelisted Customer' === $this->{$fieldName} ) ) {
                 return false;
             }
         }
@@ -484,7 +485,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             if (! isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = [];
             }
-            $similarArray[$otherOrder->ID][Email::class] = $otherOrder;
+            $similarArray[$otherOrder->ID]['Email'] = $otherOrder;
         }
 
 
@@ -540,7 +541,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 }
                 if ($tempOrder) {
                     $html .= '
-                    <li><a href="' . $tempOrder->CMSEditLink() . '">' . $tempOrder->getTitle() . '</a>: with same ' . implode(', and with same ', array_keys($fields)) . '</li>';
+                    <li><a href="' . $tempOrder->CMSEditLink() . '">' . $tempOrder->getTitle() . '</a>: with same ' . implode(', ', array_keys($fields)) . '</li>';
                 }
             }
             $html .= '
