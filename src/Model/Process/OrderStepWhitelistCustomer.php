@@ -61,14 +61,15 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      */
     public function doStep(Order $order): bool
     {
-        $entry = $this->RelevantLogEntry($order);
-        if (! $entry) {
+        $log = $this->RelevantLogEntry($order);
+        if (! $log) {
             $className = $this->relevantLogEntryClassName;
-            $entry = $className::create();
-            $entry->OrderID = $order->ID;
-            $entry->write();
+            $log = $className::create();
+            $log->OrderID = $order->ID;
+            $log->write();
         }
-        $entry->assessCustomer();
+        $log->assessCustomer();
+
         return true;
     }
 
