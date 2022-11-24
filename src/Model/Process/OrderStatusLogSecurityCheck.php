@@ -181,12 +181,19 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     )
                 ;
                 if ($previousOrders->exists()) {
+                    $links = [];
+                    foreach($previousOrders as $previousOrder) {
+                        $links[] = '<a href="'.$previousOrder->CMSEditLink().'">'.$previousOrder->Title().'</a>';
+                    }
                     $fields->addFieldToTab(
                         'Root.PreviousOrders',
-                        new GridField(
-                            'PreviousOrdersList',
-                            'Previous Orders',
-                            $previousOrders
+                        LiteralField::create(
+                            'PreviousOrders',
+                            '<ul>
+                                <li>
+                                    '.implode('</li><li>', $links).'
+                                </li>
+                            </ul>'
                         )
                     );
                 } else {
