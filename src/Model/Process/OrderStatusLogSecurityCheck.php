@@ -493,7 +493,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
 
 
         $emailArray = [];
-        $emailArray[] = $billingAddress->Email ?? '';
+        $emailArray[] = $this->billingAddress->Email ?? '';
         $emailArray[] = $member->Email ?? '';
         //adding all emails to security checks
         $this->blacklistCheck($emailArray, EcommerceSecurityEmail::class);
