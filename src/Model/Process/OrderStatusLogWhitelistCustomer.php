@@ -92,7 +92,7 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
      *
      * @return bool returns true of the member is a security risk
      */
-    public static function member_is_security_risk(Member $member) : bool
+    public static function member_is_security_risk(Member $member): bool
     {
         return $member->IsSecurityRisk;
     }

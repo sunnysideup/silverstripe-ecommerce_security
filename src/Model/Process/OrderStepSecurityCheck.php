@@ -4,9 +4,9 @@ namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\TextField;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
@@ -19,9 +19,14 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStep;
  */
 class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
 {
-
-
     protected $_checkLists = [];
+
+    /**
+     * The OrderStatusLog that is relevant to the particular step.
+     *
+     * @var string
+     */
+    protected $relevantLogEntryClassName = OrderStatusLogSecurityCheck::class;
 
     /**
      *  this array works as follows
@@ -45,39 +50,6 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      */
     private static $checks_required = [];
 
-    public function ChecksList() : array
-    {
-        if(empty($this->_checkLists)) {
-            for($i = 1; $i < 13; $i++) {
-                $titleField = 'Title'.$i;
-                $subTotalMinField = 'CheckDescriptionMinAmount'.$i;
-                if($this->$titleField && $this->$subTotalMinField) {
-                    $descriptionField = 'CheckDescription'.$i;
-                    $whitelistedCustomersExemptField = 'WhitelistedCustomersExempt'.$i;
-                    $onlyApplyToSecurityRiskCustomersField = 'OnlyApplyToSecurityRiskCustomers'.$i;
-                    $this->_checkLists['Check'.$i] = [
-                        'Title' => (string) $this->$titleField,
-                        'Description' => (string) $this->$descriptionField,
-                        'SubTotalMin' => (int) $this->$subTotalMinField,
-                        'WhitelistedCustomersExempt' => (bool) $this->$whitelistedCustomersExemptField,
-                        'OnlyApplyToSecurityRiskCustomers' => (bool) $this->$onlyApplyToSecurityRiskCustomersField,
-                    ];
-                }
-            }
-            if(empty($this->_checkLists)) {
-                $this->_checkLists = $this->Config()->get('checks_required');
-            }
-        }
-        return $this->_checkLists;
-    }
-
-    /**
-     * The OrderStatusLog that is relevant to the particular step.
-     *
-     * @var string
-     */
-    protected $relevantLogEntryClassName = OrderStatusLogSecurityCheck::class;
-
     private static $table_name = 'OrderStepSecurityCheck';
 
     /**
@@ -87,7 +59,8 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *     ]
      * ```
      * MethodToReturnTrue must have an $order as a parameter and bool as the return value
-     * e.g. MyMethod(Order $order) : bool;
+     * e.g. MyMethod(Order $order) : bool;.
+     *
      * @var array
      */
     private static $step_logic_conditions = [
@@ -155,7 +128,6 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
         'CheckDescriptionMinAmount12' => 'Int',
         'WhitelistedCustomersExempt12' => 'Boolean',
         'OnlyApplyToSecurityRiskCustomers12' => 'Boolean',
-
     ];
 
     private static $defaults = [
@@ -170,31 +142,58 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
 
     private static $_my_order;
 
+    public function ChecksList(): array
+    {
+        if (empty($this->_checkLists)) {
+            for ($i = 1; $i < 13; ++$i) {
+                $titleField = 'Title' . $i;
+                $subTotalMinField = 'CheckDescriptionMinAmount' . $i;
+                if ($this->{$titleField} && $this->{$subTotalMinField}) {
+                    $descriptionField = 'CheckDescription' . $i;
+                    $whitelistedCustomersExemptField = 'WhitelistedCustomersExempt' . $i;
+                    $onlyApplyToSecurityRiskCustomersField = 'OnlyApplyToSecurityRiskCustomers' . $i;
+                    $this->_checkLists['Check' . $i] = [
+                        'Title' => (string) $this->{$titleField},
+                        'Description' => (string) $this->{$descriptionField},
+                        'SubTotalMin' => (int) $this->{$subTotalMinField},
+                        'WhitelistedCustomersExempt' => (bool) $this->{$whitelistedCustomersExemptField},
+                        'OnlyApplyToSecurityRiskCustomers' => (bool) $this->{$onlyApplyToSecurityRiskCustomersField},
+                    ];
+                }
+            }
+            if (empty($this->_checkLists)) {
+                $this->_checkLists = $this->Config()->get('checks_required');
+            }
+        }
+
+        return $this->_checkLists;
+    }
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        for($i = 1; $i < 13; $i++) {
+        for ($i = 1; $i < 13; ++$i) {
             $fields->addFieldsToTab(
                 'Root.Checks',
                 [
-                    HeaderField::create('CheckDescriptionHeader'.$i, 'Check '.$i),
+                    HeaderField::create('CheckDescriptionHeader' . $i, 'Check ' . $i),
 
-                    TextField::create('Title'.$i, 'Name of check')
+                    TextField::create('Title' . $i, 'Name of check')
                         ->setDescription('e.g. call customer, check address, review items, etc...'),
 
-                    TextField::create('CheckDescription'.$i, 'Description of check')
+                    TextField::create('CheckDescription' . $i, 'Description of check')
                         ->setDescription('e.g. calling the customer and ask them if they ordered, bla bla, etc...'),
 
-                    NumericField::create('CheckDescriptionMinAmount'.$i, 'Minimum Order Sub-Total')
+                    NumericField::create('CheckDescriptionMinAmount' . $i, 'Minimum Order Sub-Total')
                         ->setDescription('Minimum amount for order; must be greater than zero.'),
 
                     CheckboxField::create(
-                        'WhitelistedCustomersExempt'.$i,
+                        'WhitelistedCustomersExempt' . $i,
                         'Whitelisted customers exempt'
                     ),
 
                     CheckboxField::create(
-                        'OnlyApplyToSecurityRiskCustomers'.$i,
+                        'OnlyApplyToSecurityRiskCustomers' . $i,
                         'Only apply to security risk customers'
                     ),
                 ]
@@ -241,12 +240,13 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
         return true;
     }
 
-    public function PassSecurityCheck(Order $order) : bool
+    public function PassSecurityCheck(Order $order): bool
     {
         $entry = $this->RelevantLogEntry($order);
         if ($entry) {
             return (bool) $entry->pass();
         }
+
         return false;
     }
 
