@@ -205,7 +205,7 @@ class EcommerceSecurityBaseClass extends DataObject
 
     public function getSimplerName()
     {
-        return str_replace('Blacklisted ', '', $this->singular_name());
+        return str_replace('Blacklisted ', '', (string) $this->singular_name());
     }
 
     /**
