@@ -10,6 +10,7 @@ use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBField;
@@ -128,26 +129,35 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     public function getFrontEndFields($params = null)
     {
         $order = $this->getOrderCached();
-        $fields = parent::getFrontEndFields($params);
-        $fields->unshift(ReadonlyField::create('SubTotal', 'Sub-Total'));
-        $fields->unshift(ReadonlyField::create('OrderItemInfo', 'Items', $this->renderWith('Sunnysideup\\Ecommerce\\Includes\\OrderItemsTiny')));
-        $fields->unshift(ReadonlyField::create('CustomerInfo', 'Customer', $this->getOrderCached()->Member()->getCustomerDetails()));
-        $fields->unshift(ReadonlyField::create('OrderInfo', 'Order', $this->getOrderCached()->getTitle()));
-        $fields->removeByName('OrderID');
+        if($order) {
+            $fields = parent::getFrontEndFields($params);
+            $fields->unshift(ReadonlyField::create('SubTotal', 'Sub-Total'));
+            $fields->unshift(ReadonlyField::create('OrderItemInfo', 'Items', $this->renderWith('Sunnysideup\\Ecommerce\\Includes\\OrderItemsTiny')));
+            $fields->unshift(ReadonlyField::create('CustomerInfo', 'Customer', $order->Member()->getCustomerDetails()));
+            $fields->unshift(ReadonlyField::create('OrderInfo', 'Order', $order->getTitle()));
+            $fields->removeByName('OrderID');
 
-        $toAdd = $this->mainFieldsFrontEndAndCMS();
-        foreach ($toAdd as $field) {
-            $fields->push($field);
+            $toAdd = $this->mainFieldsFrontEndAndCMS();
+            foreach ($toAdd as $field) {
+                $fields->push($field);
+            }
+
+            $toAdd = $this->requiredFieldsFrontEndAndCMS($fields);
+            foreach ($toAdd as $field) {
+                $fields->push($field);
+            }
+
+            $this->fieldAdjustmentsFrontEndAndCMS($fields);
+
+            return $fields;
+        } else {
+            return FieldList::create(
+                [
+                    LiteralField::create('OrderNotFound', '<p class="message warning">Order not found.</p>'),
+                ]
+            );
+
         }
-
-        $toAdd = $this->requiredFieldsFrontEndAndCMS($fields);
-        foreach ($toAdd as $field) {
-            $fields->push($field);
-        }
-
-        $this->fieldAdjustmentsFrontEndAndCMS($fields);
-
-        return $fields;
     }
 
     /**
