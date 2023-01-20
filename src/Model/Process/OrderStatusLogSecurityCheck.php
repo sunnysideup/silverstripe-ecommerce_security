@@ -114,7 +114,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     public function canEdit($member = null, $context = [])
     {
         $order = $this->getOrderCached();
-        if ($order && $order->exists()) {
+        if ($order) {
             $step = $order->MyStep();
             if ($step && 'SECURITY_CHECK' === $step->Code) {
                 return parent::canEdit($member);
@@ -329,7 +329,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         $order = $this->getOrderCached();
         if (self::$_saved_already < 3) {
             ++self::$_saved_already;
-            if ($order && $order->exists()) {
+            if ($order) {
                 $this->SubTotal = $order->getSubTotal();
                 $this->Risks = $this->collateRisks();
                 $this->write();
@@ -351,7 +351,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 $blacklistItem->Status = 'Bad';
                 $blacklistItem->write();
             }
-            if ($order && $order->exists()) {
+            if ($order) {
                 $order->Archive(true);
             }
             $member = $this->orderMember();
@@ -449,7 +449,6 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     protected function collateRisks()
     {
         $this->order = $this->getOrderCached();
-        $order = $this->order;
         $this->billingAddress = $this->order->BillingAddress();
         $this->shippingAddress = $this->order->ShippingAddress();
         $member = $this->orderMember();
@@ -654,7 +653,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     {
         if (! $this->_orderMember) {
             $order = $this->getOrderCached();
-            if ($order && $order->exists()) {
+            if ($order) {
                 $member = $order->Member();
                 if ($member && $member->exists()) {
                     $this->_orderMember = $member;
