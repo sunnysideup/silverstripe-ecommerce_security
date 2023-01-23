@@ -482,7 +482,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     $this->timeFilter
                 )
             )
-            ->exclude(['ID' => $order->ID])
+            ->exclude(['ID' => $this->order->ID])
         ;
         foreach ($otherOrders as $otherOrder) {
             if (! isset($similarArray[$otherOrder->ID])) {
