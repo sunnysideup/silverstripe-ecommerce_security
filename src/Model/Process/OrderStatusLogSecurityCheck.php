@@ -506,10 +506,10 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         $ipProxyArray = [];
         if ($payments) {
             foreach ($payments as $payment) {
-                if (strlen($payment->IP) > 10) {
+                if (strlen( (string) $payment->IP) > 10) {
                     $ipArray[] = $payment->IP;
                 }
-                if (strlen($payment->ProxyIP) > 10) {
+                if (strlen( (string) $payment->ProxyIP) > 10) {
                     $ipProxyArray[] = $payment->ProxyIP;
                 }
             }
