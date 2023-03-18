@@ -14,6 +14,26 @@ use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
 
 class EcommerceSecurityBaseClass extends DataObject
 {
+
+    public static function is_safe(string $string): bool
+    {
+        $class = static::class;
+        $obj = $class::get()->filter(['Title' => $string])->Last();
+        if ($obj) {
+            return $obj->Status === 'Good';
+        }
+        return false;
+    }
+
+    public static function is_risk(string $string): bool
+    {
+        $class = static::class;
+        $obj = $class::get()->filter(['Title' => $string])->Last();
+        if ($obj) {
+            return $obj->Status === 'Bad';
+        }
+        return false;
+    }
     /**
      * standard SS variable.
      *
@@ -108,7 +128,7 @@ class EcommerceSecurityBaseClass extends DataObject
         } else {
             $filterArray['ClassName'] = $className;
             $obj = $className::get()->filter($filterArray)->first();
-            if (! $obj) {
+            if (!$obj) {
                 $obj = $className::create($filterArray);
                 if ($write) {
                     $obj->write();
@@ -126,7 +146,7 @@ class EcommerceSecurityBaseClass extends DataObject
 
     public function canView($member = null, $context = [])
     {
-        if (! $member) {
+        if (!$member) {
             $member = Security::getCurrentUser();
         }
         $extended = $this->extendedCan(__FUNCTION__, $member);
@@ -142,7 +162,7 @@ class EcommerceSecurityBaseClass extends DataObject
 
     public function canEdit($member = null, $context = [])
     {
-        if (! $member) {
+        if (!$member) {
             $member = Security::getCurrentUser();
         }
         $extended = $this->extendedCan(__FUNCTION__, $member);
@@ -211,7 +231,7 @@ class EcommerceSecurityBaseClass extends DataObject
     /**
      * @return bool
      */
-    public function hasRisks()
+    public function hasRisks(): bool
     {
         return $this->Title && $this->ID && 'Bad' === $this->Status ? true : false;
     }
@@ -219,7 +239,7 @@ class EcommerceSecurityBaseClass extends DataObject
     /**
      * @return bool
      */
-    public function isSafe()
+    public function isSafe(): bool
     {
         return 'Good' === $this->Status ? true : false;
     }
@@ -227,13 +247,8 @@ class EcommerceSecurityBaseClass extends DataObject
     /**
      * @return bool
      */
-    public function hasOpinion()
+    public function hasOpinion(): bool
     {
         return 'Unknown' !== $this->Status ? true : false;
-    }
-
-    public function requireDefaultRecords()
-    {
-        parent::requireDefaultRecords();
     }
 }
