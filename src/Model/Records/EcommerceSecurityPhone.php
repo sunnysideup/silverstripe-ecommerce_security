@@ -2,6 +2,10 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Records;
 
+/**
+ * Class \Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityPhone
+ *
+ */
 class EcommerceSecurityPhone extends EcommerceSecurityBaseClass
 {
     /**

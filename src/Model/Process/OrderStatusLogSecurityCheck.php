@@ -30,10 +30,24 @@ use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityPhone;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityProxyIP;
 
 /**
- * @authors: Nicolaas [at] Sunny Side Up .co.nz
- * @package: ecommerce
- * @sub-package: model
- * @inspiration: Silverstripe Ltd, Jeremy
+ * Class \Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck
+ *
+ * @property bool $Bad
+ * @property string $Risks
+ * @property float $SubTotal
+ * @property string $Check1
+ * @property string $Check2
+ * @property string $Check3
+ * @property string $Check4
+ * @property string $Check5
+ * @property string $Check6
+ * @property string $Check7
+ * @property string $Check8
+ * @property string $Check9
+ * @property string $Check10
+ * @property string $Check11
+ * @property string $Check12
+ * @method \SilverStripe\ORM\ManyManyList|\Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass[] BlacklistItems()
  */
 class OrderStatusLogSecurityCheck extends OrderStatusLog
 {

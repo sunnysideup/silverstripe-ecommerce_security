@@ -6,12 +6,8 @@ use SilverStripe\Admin\ModelAdmin;
 use Sunnysideup\Ecommerce\Traits\EcommerceModelAdminTrait;
 
 /**
- * @description: CMS management for everything you have sold and all related data (e.g. logs, payments)
+ * Class \Sunnysideup\EcommerceSecurity\Cms\SecurityCheckModelAdmin
  *
- * @authors: Nicolaas [at] Sunny Side Up .co.nz
- * @package: ecommerce
- * @sub-package: cms
- * @inspiration: Silverstripe Ltd, Jeremy
  */
 class SecurityCheckModelAdmin extends ModelAdmin
 {

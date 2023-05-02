@@ -12,10 +12,68 @@ use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 
 /**
- * @authors: Nicolaas [at] Sunny Side Up .co.nz
- * @package: ecommerce
- * @sub-package: model
- * @inspiration: Silverstripe Ltd, Jeremy
+ * Class \Sunnysideup\EcommerceSecurity\Model\Process\OrderStepSecurityCheck
+ *
+ * @property string $Title1
+ * @property string $CheckDescription1
+ * @property int $CheckDescriptionMinAmount1
+ * @property bool $WhitelistedCustomersExempt1
+ * @property bool $OnlyApplyToSecurityRiskCustomers1
+ * @property string $Title2
+ * @property string $CheckDescription2
+ * @property int $CheckDescriptionMinAmount2
+ * @property bool $WhitelistedCustomersExempt2
+ * @property bool $OnlyApplyToSecurityRiskCustomers2
+ * @property string $Title3
+ * @property string $CheckDescription3
+ * @property int $CheckDescriptionMinAmount3
+ * @property bool $WhitelistedCustomersExempt3
+ * @property bool $OnlyApplyToSecurityRiskCustomers3
+ * @property string $Title4
+ * @property string $CheckDescription4
+ * @property int $CheckDescriptionMinAmount4
+ * @property bool $WhitelistedCustomersExempt4
+ * @property bool $OnlyApplyToSecurityRiskCustomers4
+ * @property string $Title5
+ * @property string $CheckDescription5
+ * @property int $CheckDescriptionMinAmount5
+ * @property bool $WhitelistedCustomersExempt5
+ * @property bool $OnlyApplyToSecurityRiskCustomers5
+ * @property string $Title6
+ * @property string $CheckDescription6
+ * @property int $CheckDescriptionMinAmount6
+ * @property bool $WhitelistedCustomersExempt6
+ * @property bool $OnlyApplyToSecurityRiskCustomers6
+ * @property string $Title7
+ * @property string $CheckDescription7
+ * @property int $CheckDescriptionMinAmount7
+ * @property bool $WhitelistedCustomersExempt7
+ * @property bool $OnlyApplyToSecurityRiskCustomers7
+ * @property string $Title8
+ * @property string $CheckDescription8
+ * @property int $CheckDescriptionMinAmount8
+ * @property bool $WhitelistedCustomersExempt8
+ * @property bool $OnlyApplyToSecurityRiskCustomers8
+ * @property string $Title9
+ * @property string $CheckDescription9
+ * @property int $CheckDescriptionMinAmount9
+ * @property bool $WhitelistedCustomersExempt9
+ * @property bool $OnlyApplyToSecurityRiskCustomers9
+ * @property string $Title10
+ * @property string $CheckDescription10
+ * @property int $CheckDescriptionMinAmount10
+ * @property bool $WhitelistedCustomersExempt10
+ * @property bool $OnlyApplyToSecurityRiskCustomers10
+ * @property string $Title11
+ * @property string $CheckDescription11
+ * @property int $CheckDescriptionMinAmount11
+ * @property bool $WhitelistedCustomersExempt11
+ * @property bool $OnlyApplyToSecurityRiskCustomers11
+ * @property string $Title12
+ * @property string $CheckDescription12
+ * @property int $CheckDescriptionMinAmount12
+ * @property bool $WhitelistedCustomersExempt12
+ * @property bool $OnlyApplyToSecurityRiskCustomers12
  */
 class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
 {

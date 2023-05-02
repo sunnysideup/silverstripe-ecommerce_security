@@ -2,6 +2,10 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Records;
 
+/**
+ * Class \Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityIP
+ *
+ */
 class EcommerceSecurityIP extends EcommerceSecurityBaseClass
 {
     /**

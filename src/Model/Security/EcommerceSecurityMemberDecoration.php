@@ -6,6 +6,13 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
 
+/**
+ * Class \Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityMemberDecoration
+ *
+ * @property \SilverStripe\Security\Member|\Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityMemberDecoration $owner
+ * @property bool $IsWhitelisted
+ * @property bool $IsSecurityRisk
+ */
 class EcommerceSecurityMemberDecoration extends DataExtension
 {
     private static $db = [

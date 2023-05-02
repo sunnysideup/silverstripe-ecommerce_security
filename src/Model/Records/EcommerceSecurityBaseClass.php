@@ -12,6 +12,13 @@ use Sunnysideup\Ecommerce\Forms\Fields\EcommerceClassNameOrTypeDropdownField;
 use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
 use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
 
+/**
+ * Class \Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityBaseClass
+ *
+ * @property string $Title
+ * @property string $Status
+ * @method \SilverStripe\ORM\ManyManyList|\Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck[] SecurityChecks()
+ */
 class EcommerceSecurityBaseClass extends DataObject
 {
 

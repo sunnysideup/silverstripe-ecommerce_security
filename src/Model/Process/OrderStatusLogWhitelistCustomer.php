@@ -8,10 +8,13 @@ use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
 
 /**
- * @authors: Nicolaas [at] Sunny Side Up .co.nz
- * @package: ecommerce
- * @sub-package: model
- * @inspiration: Silverstripe Ltd, Jeremy
+ * Class \Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogWhitelistCustomer
+ *
+ * @property bool $Whitelist
+ * @property int $MemberID
+ * @property int $BasedOnID
+ * @method \SilverStripe\Security\Member Member()
+ * @method \Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogWhitelistCustomer BasedOn()
  */
 class OrderStatusLogWhitelistCustomer extends OrderStatusLog
 {

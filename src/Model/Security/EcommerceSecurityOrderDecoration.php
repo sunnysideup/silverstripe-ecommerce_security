@@ -9,6 +9,12 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
 use Sunnysideup\EcommerceSecurity\Model\Process\OrderStepSecurityCheck;
 
+/**
+ * Class \Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityOrderDecoration
+ *
+ * @property \Sunnysideup\Ecommerce\Model\Order|\Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityOrderDecoration $owner
+ * @property bool $SkipToSecurityChecks
+ */
 class EcommerceSecurityOrderDecoration extends DataExtension
 {
     private static $db = [
