@@ -57,8 +57,18 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
 
     protected $order;
     protected $timeFilter = '';
-    protected $billingAddress = '';
-    protected $shippingAddress = '';
+
+    /**
+     *
+     * @var BillingAddress|null
+     */
+    protected $billingAddress = null;
+
+    /**
+     *
+     * @var ShippingAddress|null
+     */
+    protected $shippingAddress = null;
 
     protected $_orderMember;
 
@@ -520,10 +530,10 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         $ipProxyArray = [];
         if ($payments) {
             foreach ($payments as $payment) {
-                if (strlen( (string) $payment->IP) > 10) {
+                if (strlen((string) $payment->IP) > 10) {
                     $ipArray[] = $payment->IP;
                 }
-                if (strlen( (string) $payment->ProxyIP) > 10) {
+                if (strlen((string) $payment->ProxyIP) > 10) {
                     $ipProxyArray[] = $payment->ProxyIP;
                 }
             }
