@@ -295,7 +295,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             return false;
         }
         $checks = $this->RequiredChecks($order);
-        $fieldsAvailable = $this->stat('db');
+        $fieldsAvailable = $this->config()->get('db');
         foreach ($checks as $fieldName => $fieldDetails) {
             if (! isset($fieldsAvailable[$fieldName])) {
                 user_error('bad field  ....' . $fieldName);
