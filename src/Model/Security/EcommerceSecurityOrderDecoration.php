@@ -25,8 +25,8 @@ class EcommerceSecurityOrderDecoration extends DataExtension
     {
         if ($this->getOwner()->IsSubmitted()) {
             $currentStep = $this->getOwner()->MyStep()->Sort;
-            $securityStep = OrderStep::get()->filter(['ClassName' => OrderStepSecurityCheck::class])->first()->Sort;
-            if ($currentStep < $securityStep) {
+            $securityStep = OrderStep::get()->filter(['ClassName' => OrderStepSecurityCheck::class])->first();
+            if ($securityStep && $currentStep < $securityStep->Sort) {
                 $fields->addFieldsToTab(
                     'Root.Process',
                     [
