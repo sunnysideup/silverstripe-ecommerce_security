@@ -2,7 +2,7 @@
 Name: ecommerce_security
 Before:
   - '#app'
-After: 
+After:
   - '#coreconfig'
   - '#cmsextensions'
   - '#ecommerce'
@@ -24,15 +24,15 @@ Sunnysideup\Ecommerce\Model\Process\OrderStatusLog:
     - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck
     - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogWhitelistCustomer
 ---
-After: 
+Name: ecommerce_security_menu
+After:
   - '#coreconfig'
   - '#cmsextensions'
   - '#ecommerce'
   - '#app'
-Only:
-  moduleexists: 'grouped-cms-menu'
 ---
 SilverStripe\Admin\LeftAndMain:
   menu_groups:
     Shop:
-      - Sunnysideup\EcommerceSecurity\Cms\SecurityCheckModelAdmin
+      children:
+        - Sunnysideup-EcommerceSecurity-Cms-SecurityCheckModelAdmin
