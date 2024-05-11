@@ -23,16 +23,16 @@ Sunnysideup\Ecommerce\Model\Process\OrderStatusLog:
   available_log_classes_array:
     - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck
     - Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogWhitelistCustomer
----
-Name: ecommerce_security_menu
-After:
-  - '#coreconfig'
-  - '#cmsextensions'
-  - '#ecommerce'
-  - '#app'
----
-SilverStripe\Admin\LeftAndMain:
-  menu_groups:
-    Shop:
-      children:
-        - Sunnysideup-EcommerceSecurity-Cms-SecurityCheckModelAdmin
+# ---
+# Name: ecommerce_security_menu
+# After:
+#   - '#coreconfig'
+#   - '#cmsextensions'
+#   - '#ecommerce'
+#   - '#app'
+# ---
+# SilverStripe\Admin\LeftAndMain:
+#   menu_groups:
+#     Shop:
+#       children:
+#         - Sunnysideup-EcommerceSecurity-Cms-SecurityCheckModelAdmin
