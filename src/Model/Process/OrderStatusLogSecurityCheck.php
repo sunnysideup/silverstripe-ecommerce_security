@@ -11,6 +11,7 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBField;
@@ -347,7 +348,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         return $this->_requiredChecks;
     }
 
-    public function onAfterWrite()
+    protected function onAfterWrite()
     {
         parent::onAfterWrite();
         $order = $this->getOrderCached();
@@ -371,6 +372,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             }
         }
         if ($this->Bad) {
+            /** @var DataList $blacklistItem */
             foreach ($this->BlacklistItems() as $blacklistItem) {
                 $blacklistItem->Status = 'Bad';
                 $blacklistItem->write();

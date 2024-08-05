@@ -114,7 +114,7 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
         return $member->IsWhitelisted ? true : false;
     }
 
-    public function onAfterWrite()
+    protected function onAfterWrite()
     {
         parent::onAfterWrite();
         if ($this->Whitelist) {
