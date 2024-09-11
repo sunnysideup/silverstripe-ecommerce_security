@@ -154,7 +154,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
     public function getFrontEndFields($params = null)
     {
         $order = $this->getOrderCached();
-        if($order) {
+        if ($order) {
             $fields = parent::getFrontEndFields($params);
             $fields->unshift(ReadonlyField::create('SubTotal', 'Sub-Total'));
             $fields->unshift(ReadonlyField::create('OrderItemInfo', 'Items', $this->renderWith('Sunnysideup\\Ecommerce\\Includes\\OrderItemsTiny')));
@@ -404,7 +404,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         if ($securityIP) {
             $country = EcommerceCountryVisitorCountryProvider::ip2country($securityIP);
             if ($country) {
-                $country = '<em>Country:</em> ' . $country . '</br>';
+                $country = '<em>Country:</em> ' . $country . '<br>';
             }
             $fieldArray[] =
                 LiteralField::create(
