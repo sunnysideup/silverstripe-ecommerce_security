@@ -181,7 +181,6 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     LiteralField::create('OrderNotFound', '<p class="message warning">Order not found.</p>'),
                 ]
             );
-
         }
     }
 
@@ -215,8 +214,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     )
                     ->exclude(
                         ['ID' => $order->ID]
-                    )
-                ;
+                    );
                 if ($previousOrders->exists()) {
                     $links = [];
                     foreach ($previousOrders as $previousOrder) {
@@ -508,8 +506,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                     $this->timeFilter
                 )
             )
-            ->exclude(['ID' => $this->order->ID])
-        ;
+            ->exclude(['ID' => $this->order->ID]);
         foreach ($otherOrders as $otherOrder) {
             if (! isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = [];
@@ -531,6 +528,9 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         $ipArray = [];
         $ipProxyArray = [];
         if ($payments) {
+            /**
+             * @var EcommercePayment $payment
+             */
             foreach ($payments as $payment) {
                 if (strlen((string) $payment->IP) > 10) {
                     $ipArray[] = $payment->IP;
@@ -606,22 +606,24 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         $similarArray = [];
         //phones
         $testArray = [];
-        if ($this->billingAddress) {
-            if ($this->billingAddress->{$billingField}) {
-                $testArray[] = $this->billingAddress->{$billingField};
-            }
+
+        if ($this->billingAddress?->{$billingField}) {
+            $testArray[] = $this->billingAddress->{$billingField};
         }
-        if ($shippingField) {
-            if ($this->shippingAddress) {
-                if ($this->shippingAddress->{$shippingField}) {
-                    $testArray[] = $this->shippingAddress->{$shippingField};
-                }
-            }
+
+        if ($shippingField && $this->shippingAddress?->{$shippingField}) {
+            $testArray[] = $this->shippingAddress->{$shippingField};
         }
-        //are there any orders with the same phone in the last xxx days...
-        $otherBillingAddresses = BillingAddress::get()->filter(
-            [$billingField => $testArray] + $this->timeFilter
-        )->exclude(['OrderID' => $this->order->ID]);
+
+        $filters = $this->timeFilter;
+
+        if (!empty($testArray)) {
+            $filters[$billingField] = $testArray;
+        }
+
+        $otherBillingAddresses = BillingAddress::get()
+            ->filter($filters)
+            ->exclude(['OrderID' => $this->order->ID]);
         foreach ($otherBillingAddresses as $address) {
             $otherOrder = $address->getOrderCached();
             if ($otherOrder && $otherOrder->ID !== $this->order->ID) {
