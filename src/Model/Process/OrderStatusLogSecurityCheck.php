@@ -633,10 +633,10 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
                 $similarArray[$otherOrder->ID][$billingField] = $otherOrder;
             }
         }
-        if ($shippingField) {
-            $otherShippingAddresses = ShippingAddress::get()->filter(
-                [$shippingField => $testArray] + $this->timeFilter
-            )->exclude(['OrderID' => $this->order->ID]);
+        if ($shippingField && ! empty($testArray)) {
+            $otherShippingAddresses = ShippingAddress::get()
+                ->filter([$shippingField => $testArray] + $this->timeFilter)
+                ->exclude(['OrderID' => $this->order?->ID ?: 0]);
             foreach ($otherShippingAddresses as $address) {
                 $otherOrder = $address->getOrderCached();
                 if ($otherOrder && $otherOrder->ID !== $this->order->ID) {
