@@ -2,18 +2,19 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Security;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\Security\Member;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
 use Sunnysideup\EcommerceSecurity\Model\Records\EcommerceSecurityEmail;
 
 /**
  * Class \Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityMemberDecoration
  *
- * @property \SilverStripe\Security\Member|\Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityMemberDecoration $owner
+ * @property Member|EcommerceSecurityMemberDecoration $owner
  * @property bool $IsWhitelisted
  * @property bool $IsSecurityRisk
  */
-class EcommerceSecurityMemberDecoration extends DataExtension
+class EcommerceSecurityMemberDecoration extends Extension
 {
     private static $db = [
         'IsWhitelisted' => 'Boolean',
@@ -25,17 +26,16 @@ class EcommerceSecurityMemberDecoration extends DataExtension
      */
     public function onBeforeWrite()
     {
-        parent::onBeforeWrite();
-        if ($this->getOwner()->IsSecurityRisk) {
-            $this->getOwner()->IsWhitelisted = false;
-            $securityCheck = EcommerceSecurityEmail::get()->filter(['Title' => $this->getOwner()->Email])->first();
-            if ($securityCheck) {
-                $securityCheck->Status = 'Bad';
-            } else {
-                $securityCheck = EcommerceSecurityEmail::create();
-                $securityCheck->Title = $this->getOwner()->Email;
-                $securityCheck->Status = 'Bad';
+        $owner = $this->getOwner();
+        if ($owner->IsSecurityRisk) {
+            $owner->IsWhitelisted = false;
+            $filter = ['Title' => $owner->Email];
+            $securityCheck = EcommerceSecurityEmail::get()->filter($filter)->first();
+            if (!$securityCheck) {
+                $securityCheck = EcommerceSecurityEmail::create($filter);
             }
+
+            $securityCheck->Status = 'Bad';
             $securityCheck->write();
         }
     }

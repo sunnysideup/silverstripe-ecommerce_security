@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
+use Override;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HeaderField;
@@ -219,6 +220,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
                     ];
                 }
             }
+
             if (empty($this->_checkLists)) {
                 $this->_checkLists = $this->Config()->get('checks_required');
             }
@@ -227,6 +229,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
         return $this->_checkLists;
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -270,6 +273,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *
      * @return bool - true if the current step is ready to be run...
      */
+    #[Override]
     public function initStep(Order $order): bool
     {
         $logsExist = $this->RelevantLogEntries($order)->exists();
@@ -293,6 +297,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *
      * @return bool - true if run correctly
      */
+    #[Override]
     public function doStep(Order $order): bool
     {
         return true;
@@ -313,6 +318,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *
      * @return FieldList
      */
+    #[Override]
     public function addOrderStepFields(FieldList $fields, Order $order, ?bool $nothingToDo = false)
     {
         $fields = parent::addOrderStepFields($fields, $order);
@@ -333,6 +339,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *
      * @return bool
      */
+    #[Override]
     public function hasCustomerMessage()
     {
         return false;
@@ -343,6 +350,7 @@ class OrderStepSecurityCheck extends OrderStep implements OrderStepInterface
      *
      * @return string
      */
+    #[Override]
     protected function myDescription()
     {
         return 'Make sure that the Order is safe to proceed';

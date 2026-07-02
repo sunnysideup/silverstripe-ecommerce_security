@@ -1,6 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\EcommerceSecurity\Interfaces;
+
+use Sunnysideup\Ecommerce\Model\Order;
+use SilverStripe\Forms\FormField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\HeaderField;
 
 /**
  * @author: Nicolaas [at] Sunny Side Up .co.nz
@@ -14,9 +21,9 @@ interface EcommerceSecurityLogInterface
      * if does not return NULL, then a tab will be created in ecom Sec. with the
      * actual OrderStatusLog entry or entries.
      *
-     * @param \Sunnysideup\Ecommerce\Model\Order $order
+     * @param Order $order
      *
-     * @return null|\SilverStripe\Forms\FormField
+     * @return null|FormField
      */
     public function getSecurityLogTable($order);
 
@@ -30,16 +37,16 @@ interface EcommerceSecurityLogInterface
     /**
      * returns a summary without header for the Ecom Sec. Main summary Page.
      *
-     * @param \Sunnysideup\Ecommerce\Model\Order $order
+     * @param Order $order
      *
-     * @return \SilverStripe\Forms\LiteralField (html)
+     * @return LiteralField (html)
      */
     public function getSecuritySummary($order);
 
     /**
      * returns the header to be used in TAB and in Summary Page (on the Ecom Security Module).
      *
-     * @return \SilverStripe\Forms\HeaderField
+     * @return HeaderField
      */
     public function getSecurityHeader();
 }
