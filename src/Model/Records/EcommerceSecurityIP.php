@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\EcommerceSecurity\Model\Records;
 
 /**
@@ -8,6 +10,8 @@ namespace Sunnysideup\EcommerceSecurity\Model\Records;
  */
 class EcommerceSecurityIP extends EcommerceSecurityBaseClass
 {
+    private static $table_name = 'EcommerceSecurityIP';
+
     /**
      * standard SS variable.
      *

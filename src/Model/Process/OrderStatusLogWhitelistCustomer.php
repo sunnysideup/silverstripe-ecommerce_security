@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
+use Override;
 use SilverStripe\Security\Member;
 use Sunnysideup\CmsEditLinkField\Forms\Fields\CMSEditLinkField;
 use Sunnysideup\Ecommerce\Model\Order;
@@ -13,8 +14,8 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStatusLog;
  * @property bool $Whitelist
  * @property int $MemberID
  * @property int $BasedOnID
- * @method \SilverStripe\Security\Member Member()
- * @method \Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogWhitelistCustomer BasedOn()
+ * @method Member Member()
+ * @method OrderStatusLogWhitelistCustomer BasedOn()
  */
 class OrderStatusLogWhitelistCustomer extends OrderStatusLog
 {
@@ -42,31 +43,37 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
 
     private static $plural_name = 'Whitelist Customer Records';
 
+    #[Override]
     public function i18n_singular_name()
     {
         return self::$singular_name;
     }
 
-    public function i18n_plural_name()
+    #[Override]
+    public function plural_name()
     {
         return self::$plural_name;
     }
 
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
     }
 
+    #[Override]
     public function canEdit($member = null, $context = [])
     {
         return parent::canEdit($member);
     }
 
+    #[Override]
     public function canDelete($member = null)
     {
         return false;
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -111,19 +118,18 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
             return false;
         }
 
-        return $member->IsWhitelisted ? true : false;
+        return (bool) $member->IsWhitelisted;
     }
 
+    #[Override]
     protected function onAfterWrite()
     {
         parent::onAfterWrite();
         if ($this->Whitelist) {
             $member = $this->Member();
-            if ($member) {
-                if ($member->exists()) {
-                    $member->IsWhitelisted = true;
-                    $member->write();
-                }
+            if ($member && $member->exists()) {
+                $member->IsWhitelisted = true;
+                $member->write();
             }
         }
     }
@@ -134,58 +140,60 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
         if ($this->Whitelist) {
             return true;
         }
+
         $order = $this->getOrderCached();
-        if ($order && $order->exists()) {
-            if ($order->MemberID) {
-                $this->MemberID = $order->MemberID;
-                $this->Whitelist = false;
-                $member = $order->Member();
-                if ($member && $member->exists()) {
-                    //check if member has previouly been whitelisted
-                    $previousOne = OrderStatusLogWhitelistCustomer::get()
+        if ($order && $order->exists() && $order->MemberID) {
+            $this->MemberID = $order->MemberID;
+            $this->Whitelist = false;
+            $member = $order->Member();
+            if ($member && $member->exists()) {
+                //check if member has previouly been whitelisted
+                $previousOne = OrderStatusLogWhitelistCustomer::get()
+                    ->filter(
+                        [
+                            'Whitelist' => 1,
+                            'MemberID' => $member->ID,
+                        ]
+                    )
+                    ->exclude(
+                        ['OrderID' => $order->ID]
+                    )->first();
+                if ($previousOne) {
+                    $this->Whitelist = true;
+                    $this->BasedOnID = $previousOne->ID;
+                } else {
+                    //member has placed orders before
+                    $previousOrders = Order::get()
                         ->filter(
                             [
-                                'Whitelist' => 1,
                                 'MemberID' => $member->ID,
+                                'CancelledByID' => 0,
                             ]
                         )
                         ->exclude(
-                            ['OrderID' => $order->ID]
-                        )->first();
-                    if ($previousOne) {
-                        $this->Whitelist = true;
-                        $this->BasedOnID = $previousOne->ID;
-                    } else {
-                        //member has placed orders before
-                        $previousOrders = Order::get()
-                            ->filter(
-                                [
-                                    'MemberID' => $member->ID,
-                                    'CancelledByID' => 0,
-                                ]
-                            )
-                            ->exclude(
-                                [
-                                    'ID' => $order->ID,
-                                ]
-                            )
-                        ;
-                        $count = 0;
-                        $minOrdersRequired = $this->Config()->get('min_number_of_paid_orders_required');
-                        foreach ($previousOrders as $previousOrder) {
-                            if ($previousOrder->IsPaid() && $previousOrder->IsArchived()) {
-                                ++$count;
-                                if ($count >= $minOrdersRequired) {
-                                    $this->Whitelist = true;
+                            [
+                                'ID' => $order->ID,
+                            ]
+                        )
+                    ;
+                    $count = 0;
+                    $minOrdersRequired = $this->Config()->get('min_number_of_paid_orders_required');
+                    foreach ($previousOrders as $previousOrder) {
+                        if ($previousOrder->IsPaid() && $previousOrder->IsArchived()) {
+                            ++$count;
+                            if ($count >= $minOrdersRequired) {
+                                $this->Whitelist = true;
 
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
                 }
-                $this->write();
             }
+
+            $this->write();
         }
+
+        return null;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Process;
 
+use Override;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
@@ -12,6 +13,8 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStep;
  */
 class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
 {
+    private static $table_name = 'OrderStepWhitelistCustomer';
+
     /**
      * The OrderStatusLog that is relevant to the particular step.
      *
@@ -34,6 +37,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      */
     private $_completed;
 
+    #[Override]
     public function getCMSFields()
     {
         return parent::getCMSFields();
@@ -48,6 +52,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      *
      * @return bool - true if the current step is ready to be run...
      */
+    #[Override]
     public function initStep(Order $order): bool
     {
         return true;
@@ -63,6 +68,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      *
      * @return bool - true if run correctly
      */
+    #[Override]
     public function doStep(Order $order): bool
     {
         $log = $this->RelevantLogEntry($order);
@@ -72,11 +78,13 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
             $log->OrderID = $order->ID;
             $log->write();
         }
+
         $log->assessCustomer();
 
         return true;
     }
 
+    #[Override]
     public function HideFromEveryone(): bool
     {
         return true;
@@ -87,6 +95,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      *
      * @return bool
      */
+    #[Override]
     public function hasCustomerMessage()
     {
         return false;
@@ -97,6 +106,7 @@ class OrderStepWhitelistCustomer extends OrderStep implements OrderStepInterface
      *
      * @return string
      */
+    #[Override]
     protected function myDescription()
     {
         return 'Whitelist a customer if they qualify for this.';

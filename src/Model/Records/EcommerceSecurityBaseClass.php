@@ -2,6 +2,9 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Records;
 
+use Override;
+use SilverStripe\ORM\ManyManyList;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\ReadonlyField;
@@ -17,7 +20,7 @@ use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
  *
  * @property string $Title
  * @property string $Status
- * @method \SilverStripe\ORM\ManyManyList|\Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck[] SecurityChecks()
+ * @method ManyManyList|OrderStatusLogSecurityCheck[] SecurityChecks()
  */
 class EcommerceSecurityBaseClass extends DataObject
 {
@@ -29,6 +32,7 @@ class EcommerceSecurityBaseClass extends DataObject
         if ($obj) {
             return $obj->Status === 'Good';
         }
+
         return false;
     }
 
@@ -39,8 +43,10 @@ class EcommerceSecurityBaseClass extends DataObject
         if ($obj) {
             return $obj->Status === 'Bad';
         }
+
         return false;
     }
+
     /**
      * standard SS variable.
      *
@@ -103,12 +109,14 @@ class EcommerceSecurityBaseClass extends DataObject
 
     private static $default_sort = 'Status DESC';
 
+    #[Override]
     public function i18n_singular_name()
     {
         return Config::inst()->get($this->ClassName, 'singular_name');
     }
 
-    public function i18n_plural_name()
+    #[Override]
+    public function plural_name()
     {
         return Config::inst()->get($this->ClassName, 'plural_name');
     }
@@ -146,20 +154,24 @@ class EcommerceSecurityBaseClass extends DataObject
         return $obj;
     }
 
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return true;
     }
 
+    #[Override]
     public function canView($member = null, $context = [])
     {
         if (!$member) {
             $member = Security::getCurrentUser();
         }
+
         $extended = $this->extendedCan(__FUNCTION__, $member);
         if (null !== $extended) {
             return $extended;
         }
+
         if (Permission::checkMember($member, Config::inst()->get(EcommerceRole::class, 'admin_permission_code'))) {
             return true;
         }
@@ -167,15 +179,18 @@ class EcommerceSecurityBaseClass extends DataObject
         return parent::canView($member);
     }
 
+    #[Override]
     public function canEdit($member = null, $context = [])
     {
         if (!$member) {
             $member = Security::getCurrentUser();
         }
+
         $extended = $this->extendedCan(__FUNCTION__, $member);
         if (null !== $extended) {
             return $extended;
         }
+
         if (Permission::checkMember($member, Config::inst()->get(EcommerceRole::class, 'admin_permission_code'))) {
             return true;
         }
@@ -183,6 +198,7 @@ class EcommerceSecurityBaseClass extends DataObject
         return parent::canEdit($member);
     }
 
+    #[Override]
     public function canDelete($member = null)
     {
         return false;
@@ -191,8 +207,9 @@ class EcommerceSecurityBaseClass extends DataObject
     /**
      * CMS Fields.
      *
-     * @return \SilverStripe\Forms\FieldList
+     * @return FieldList
      */
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -240,7 +257,7 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     public function hasRisks(): bool
     {
-        return $this->Title && $this->ID && 'Bad' === $this->Status ? true : false;
+        return $this->Title && $this->ID && 'Bad' === $this->Status;
     }
 
     /**
@@ -248,7 +265,7 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     public function isSafe(): bool
     {
-        return 'Good' === $this->Status ? true : false;
+        return 'Good' === $this->Status;
     }
 
     /**
@@ -256,6 +273,6 @@ class EcommerceSecurityBaseClass extends DataObject
      */
     public function hasOpinion(): bool
     {
-        return 'Unknown' !== $this->Status ? true : false;
+        return 'Unknown' !== $this->Status;
     }
 }

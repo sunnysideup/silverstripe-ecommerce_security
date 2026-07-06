@@ -2,9 +2,10 @@
 
 namespace Sunnysideup\EcommerceSecurity\Model\Security;
 
+use SilverStripe\Core\Extension;
+use Sunnysideup\Ecommerce\Model\Order;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecurity\Model\Process\OrderStatusLogSecurityCheck;
 use Sunnysideup\EcommerceSecurity\Model\Process\OrderStepSecurityCheck;
@@ -12,10 +13,10 @@ use Sunnysideup\EcommerceSecurity\Model\Process\OrderStepSecurityCheck;
 /**
  * Class \Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityOrderDecoration
  *
- * @property \Sunnysideup\Ecommerce\Model\Order|\Sunnysideup\EcommerceSecurity\Model\Security\EcommerceSecurityOrderDecoration $owner
+ * @property Order|EcommerceSecurityOrderDecoration $owner
  * @property bool $SkipToSecurityChecks
  */
-class EcommerceSecurityOrderDecoration extends DataExtension
+class EcommerceSecurityOrderDecoration extends Extension
 {
     private static $db = [
         'SkipToSecurityChecks' => 'Boolean',
@@ -42,6 +43,7 @@ class EcommerceSecurityOrderDecoration extends DataExtension
                 );
             }
         }
+
         if($done === false) {
             $fields->removeByName('SkipToSecurityChecks');
         }
@@ -52,7 +54,6 @@ class EcommerceSecurityOrderDecoration extends DataExtension
      */
     public function onBeforeWrite()
     {
-        parent::onBeforeWrite();
         if ($this->getOwner()->SkipToSecurityChecks) {
             $logExists = OrderStatusLogSecurityCheck::get()->filter(['OrderID' => $this->getOwner()->ID])->exists();
             if (!$logExists) {
