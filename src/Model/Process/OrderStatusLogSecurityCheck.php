@@ -9,6 +9,7 @@ use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\HTMLReadonlyField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataList;
@@ -165,7 +166,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             $fields = parent::getFrontEndFields($params);
             $fields->unshift(ReadonlyField::create('SubTotal', 'Sub-Total'));
             $fields->unshift(ReadonlyField::create('OrderItemInfo', 'Items', $this->renderWith('Sunnysideup\\Ecommerce\\Includes\\OrderItemsTiny')));
-            $fields->unshift(ReadonlyField::create('CustomerInfo', 'Customer', $order->getCustomerSummary()));
+            $fields->unshift(HTMLReadonlyField::create('CustomerInfo', 'Customer', $order->getCustomerSummaryHTML()));
             $fields->unshift(ReadonlyField::create('OrderInfo', 'Order', $order->getTitle()));
             $fields->removeByName('OrderID');
 
