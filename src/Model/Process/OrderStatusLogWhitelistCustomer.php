@@ -136,6 +136,15 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
         }
         $order = $this->getOrderCached();
         if ($order && $order->exists()) {
+            // An order that someone placed with the email address of a member, without proving that they own it
+            // (Order.EmailNotVerified), does not earn trust for that member and can not use it either.
+            if ($order->EmailNotVerified) {
+                $this->MemberID = $order->MemberID;
+                $this->Whitelist = false;
+                $this->write();
+
+                return false;
+            }
             if ($order->MemberID) {
                 $this->MemberID = $order->MemberID;
                 $this->Whitelist = false;
@@ -162,6 +171,8 @@ class OrderStatusLogWhitelistCustomer extends OrderStatusLog
                                 [
                                     'MemberID' => $member->ID,
                                     'CancelledByID' => 0,
+                                    // only orders that the member has placed (see above)
+                                    'EmailNotVerified' => 0,
                                 ]
                             )
                             ->exclude(

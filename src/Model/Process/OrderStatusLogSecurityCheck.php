@@ -131,6 +131,13 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
      */
     private $_memberIsWhitelisted;
 
+    /**
+     * caching variable only...
+     *
+     * @var bool
+     */
+    private $_memberIsSecurityRisk;
+
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -378,7 +385,9 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             if ($order) {
                 $order->Archive(true);
             }
-            $member = $this->orderMember();
+            // Not for orders that someone placed with the email address of this member (Order.EmailNotVerified):
+            // the member did not necessarily place that order, so they must not be marked as a risk.
+            $member = $this->orderIsHeldUntilEmailIsVerified() ? null : $this->orderMember();
             if ($member) {
                 $member->IsWhitelisted = false;
                 $member->IsSecurityRisk = true;
@@ -658,7 +667,12 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
         if (null === $this->_memberIsWhitelisted) {
             $member = $this->orderMember();
             if ($member) {
-                $this->_memberIsWhitelisted = OrderStatusLogWhitelistCustomer::member_is_whitelisted($member);
+                // An order that was placed by someone who only entered the email address of this member
+                // (Order.EmailNotVerified) was not necessarily placed by this member:
+                // the trust that this member has earned does not apply to it.
+                $this->_memberIsWhitelisted = $this->orderIsHeldUntilEmailIsVerified()
+                    ? false
+                    : OrderStatusLogWhitelistCustomer::member_is_whitelisted($member);
             }
         }
 
@@ -667,14 +681,26 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
 
     protected function memberIsSecurityRisk()
     {
-        if (null === $this->_memberIsWhitelisted) {
+        // NB: this used to share its cache with memberIsWhitelisted, which returned the wrong answer.
+        if (null === $this->_memberIsSecurityRisk) {
             $member = $this->orderMember();
             if ($member) {
-                $this->_memberIsWhitelisted = OrderStatusLogWhitelistCustomer::member_is_security_risk($member);
+                $this->_memberIsSecurityRisk = (bool) OrderStatusLogWhitelistCustomer::member_is_security_risk($member);
             }
         }
 
-        return $this->_memberIsWhitelisted;
+        return $this->_memberIsSecurityRisk;
+    }
+
+    /**
+     * Was the order placed by someone who entered the email address of the member
+     * without proving that they own it?
+     */
+    protected function orderIsHeldUntilEmailIsVerified(): bool
+    {
+        $order = $this->getOrderCached();
+
+        return $order && $order->exists() && $order->EmailNotVerified;
     }
 
     protected function orderMember(): ?Member
