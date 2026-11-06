@@ -165,7 +165,7 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             $fields = parent::getFrontEndFields($params);
             $fields->unshift(ReadonlyField::create('SubTotal', 'Sub-Total'));
             $fields->unshift(ReadonlyField::create('OrderItemInfo', 'Items', $this->renderWith('Sunnysideup\\Ecommerce\\Includes\\OrderItemsTiny')));
-            $fields->unshift(ReadonlyField::create('CustomerInfo', 'Customer', $order->Member()->getCustomerDetails()));
+            $fields->unshift(ReadonlyField::create('CustomerInfo', 'Customer', $order->getCustomerSummary()));
             $fields->unshift(ReadonlyField::create('OrderInfo', 'Order', $order->getTitle()));
             $fields->removeByName('OrderID');
 
