@@ -509,14 +509,22 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             }
         }
         //are there any orders with the same Member.email in the last seven days...
-        $otherOrders = Order::get_datalist_of_orders_with_submit_record()
-            ->filter(
-                array_merge(
-                    ['MemberID' => $member->ID],
-                    $this->timeFilter
-                )
-            )
-            ->exclude(['ID' => $this->order->ID]);
+        $emailArray = array_values(array_unique(array_filter([
+            trim((string) $this->billingAddress?->Email),
+            trim((string) $member?->Email),
+        ], static fn (string $email): bool => $email !== '')));
+
+        $otherOrders = [];
+        if ($emailArray !== []) {
+            $otherOrders = Order::get_datalist_of_orders_with_submit_record()
+                ->filter($this->timeFilter)
+                ->filterAny([
+                    'BillingAddress.Email' => $emailArray,
+                    'Member.Email' => $emailArray,
+                ])
+                ->exclude('ID', $this->order->ID);
+        }
+
         foreach ($otherOrders as $otherOrder) {
             if (! isset($similarArray[$otherOrder->ID])) {
                 $similarArray[$otherOrder->ID] = [];
@@ -524,9 +532,6 @@ class OrderStatusLogSecurityCheck extends OrderStatusLog
             $similarArray[$otherOrder->ID]['Email'] = $otherOrder;
         }
 
-        $emailArray = [];
-        $emailArray[] = $this->billingAddress->Email ?? '';
-        $emailArray[] = $member->Email ?? '';
         //adding all emails to security checks
         $this->blacklistCheck($emailArray, EcommerceSecurityEmail::class);
 
